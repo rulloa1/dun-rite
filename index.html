@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Dun-Rite Family of Builders — DunRite Construction &amp; DRC Homes</title>
+<meta name="description" content="Two Central Florida builders, one family. DunRite Construction for shell, concrete & developer work. DRC Homes for residential renovation & new construction." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Archivo:wght@600;700;800;900&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+  :root{ --mono: "Spline Sans Mono", monospace; }
+  html,body{ height: 100%; }
+  body{ background:#0a0a0b; color:#fff; font-family:"Sora",system-ui,sans-serif; overflow:hidden; }
+
+  .switch{ display:flex; height:100vh; width:100vw; position:relative; }
+  @media (max-width: 800px){ .switch{ flex-direction:column; } }
+
+  .panel{ position:relative; flex:1; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    transition: flex .55s cubic-bezier(.6,.05,.2,1); cursor:pointer; text-decoration:none; }
+  .panel .bg{ position:absolute; inset:0; }
+  .panel .bg img{ width:100%; height:100%; object-fit:cover; transition: transform .9s ease, filter .6s ease; filter: grayscale(.2); }
+  .panel .veil{ position:absolute; inset:0; transition: background .5s ease; }
+
+  /* DunRite — industrial dark + amber */
+  .dunrite .veil{ background: linear-gradient(180deg, rgba(8,8,9,.62), rgba(8,8,9,.9)); }
+  .dunrite .accent{ color:#f4a01e; }
+  .dunrite .enter{ background:#f4a01e; color:#1a1205; }
+
+  /* DRC — navy + orange */
+  .drc .veil{ background: linear-gradient(180deg, rgba(12,21,48,.6), rgba(12,21,48,.92)); }
+  .drc .accent{ color:#f89925; }
+  .drc .enter{ background:#f89925; color:#1a1205; }
+
+  .panel:hover{ flex: 1.45; }
+  .panel:hover .bg img{ transform: scale(1.06); filter: grayscale(0); }
+  .switch:hover .panel:not(:hover){ flex: .8; }
+
+  .inner{ position:relative; z-index:2; text-align:center; padding:40px; max-width:520px;
+    display:flex; flex-direction:column; align-items:center; gap:22px;
+    transform: translateY(8px); transition: transform .5s ease; }
+  .panel:hover .inner{ transform: translateY(0); }
+  .logo{ height:74px; width:auto; margin-bottom:4px; }
+  @media (max-width:800px){ .logo{ height:54px; } }
+  .kicker{ font-family:var(--mono); font-size:12.5px; letter-spacing:.24em; text-transform:uppercase; opacity:.82; }
+  .ptitle{ font-size:clamp(26px,3vw,40px); font-weight:800; line-height:1.05; letter-spacing:-.02em; }
+  .pdesc{ font-size:15px; line-height:1.55; color:rgba(255,255,255,.78); max-width:34ch; }
+  .enter{ display:inline-flex; align-items:center; gap:10px; font-family:"Sora"; font-weight:700; font-size:14px;
+    padding:14px 26px; border-radius:11px; opacity:0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease, filter .2s ease; margin-top:6px; }
+  .enter .arr{ transition: transform .2s ease; }
+  .enter:hover .arr{ transform: translateX(5px); }
+  .panel:hover .enter{ opacity:1; transform:none; }
+  @media (max-width:800px){ .enter{ opacity:1; transform:none; } .panel:hover{ flex:1; } .switch:hover .panel:not(:hover){ flex:1; } }
+
+  /* center seam badge */
+  .seam{ position:absolute; left:50%; top:0; transform:translateX(-50%); z-index:5;
+    background:#0a0a0b; border:1px solid rgba(255,255,255,.14); border-top:none;
+    padding:11px 22px 12px; border-radius:0 0 14px 14px; text-align:center; }
+  .seam .fam{ font-family:var(--mono); font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .seam .fam b{ color:#fff; }
+  @media (max-width:800px){ .seam{ position:fixed; top:0; } }
+
+  .divider{ position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(255,255,255,.16); z-index:3; transform:translateX(-50%); }
+  @media (max-width:800px){ .divider{ width:auto; left:0; right:0; top:50%; height:1px; bottom:auto; } }
+</style>
+</head>
+<body>
+
+<div class="seam"><div class="fam">One Family of Builders · <b>Dun-Rite</b></div></div>
+
+<main class="switch">
+  <a class="panel dunrite" href="the-build.html">
+    <div class="bg"><img src="assets/stone-frame-shell.jpg" alt="DunRite concrete shell construction" /></div>
+    <div class="veil"></div>
+    <div class="inner">
+      <img class="logo" src="https://www.dunriteconstructiongroup.com/wp-content/uploads/2025/09/Dunrite-Logo_invert-e1758651959544.png" alt="DunRite Construction Group" />
+      <div class="kicker accent">Shell · Concrete · Developer</div>
+      <div class="ptitle">Slabs, shells &amp; large-scale concrete, <span class="accent">done rite.</span></div>
+      <p class="pdesc">The commercial &amp; developer side — turnkey shell packages and concrete for Florida's builders.</p>
+      <span class="enter">Enter DunRite <span class="arr">→</span></span>
+    </div>
+  </a>
+
+  <a class="panel drc" href="drc/index.html">
+    <div class="bg"><img src="https://www.drchomesfl.com/wp-content/uploads/2025/12/cr-4.webp" alt="DRC Homes custom residential build" /></div>
+    <div class="veil"></div>
+    <div class="inner">
+      <img class="logo" src="https://www.drchomesfl.com/wp-content/uploads/2025/09/DRC-Logo_invert.png" alt="DRC Homes" />
+      <div class="kicker accent">Renovation · Additions · New Builds</div>
+      <div class="ptitle">Transform your home with <span class="accent">quality craftsmanship.</span></div>
+      <p class="pdesc">The residential side — remodels, additions, and custom homes with a homeowner-first approach.</p>
+      <span class="enter">Enter DRC Homes <span class="arr">→</span></span>
+    </div>
+  </a>
+
+  <div class="divider"></div>
+</main>
+
+</body>
+</html>
