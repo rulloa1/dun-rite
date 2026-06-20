@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Construction Schedule — Gantt Chart</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --brand-blue: #1583C7;
+      --brand-cyan: #1DB4E8;
+      --brand-navy: #0B3B6B;
+      --ok: #1F8A5B;
+      --warn: #E08A1E;
+      --err: #C13E3E;
+      --ink: #0F1419;
+      --muted: #7A8390;
+      --border: #E3E5E7;
+      --bg: #FAFBFC;
+      --bg-alt: #F3F4F6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--ink);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .controls button.active {
+      background: var(--brand-blue);
+      color: white;
+      border-color: var(--brand-blue);
+    }
+
+    .controls button:hover {
+      border-color: var(--brand-blue);
+      color: var(--brand-blue);
+    }
+
+    .gantt-wrapper {
+      overflow-x: auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .gantt {
+      display: flex;
+      min-width: 100%;
+    }
+
+    .gantt-sidebar {
+      min-width: 240px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-alt);
+      padding: 0;
+    }
+
+    .gantt-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: var(--bg-alt);
+    }
+
+    .gantt-row {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .gantt-task {
+      padding: 16px;
+      min-width: 240px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: white;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .gantt-task-label {
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .gantt-task-status {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: capitalize;
+    }
+
+    .gantt-chart {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      position: relative;
+      background: white;
+      min-height: 100%;
+    }
+
+    .gantt-month-labels {
+      display: flex;
+      height: 40px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .gantt-month {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gantt-timeline {
+      position: relative;
+      flex: 1;
+      display: flex;
+    }
+
+    .gantt-row-content {
+      position: relative;
+      flex: 1;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .gantt-bar {
+      height: 24px;
+      border-radius: 4px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.2s;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gantt-bar:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .gantt-bar.done {
+      background: var(--ok);
+      opacity: 0.8;
+    }
+
+    .gantt-bar.active {
+      background: var(--brand-blue);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
+    }
+
+    .gantt-bar.next {
+      background: var(--brand-cyan);
+      opacity: 0.6;
+    }
+
+    .gantt-today {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: var(--err);
+      z-index: 10;
+      box-shadow: 0 0 4px rgba(193,62,62,0.3);
+    }
+
+    .gantt-today-label {
+      position: absolute;
+      top: -24px;
+      left: -16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--err);
+      background: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      z-index: 11;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--brand-blue);
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--bg-alt);
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-color {
+      width: 24px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .legend-color.done {
+      background: var(--ok);
+    }
+
+    .legend-color.active {
+      background: var(--brand-blue);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+    }
+
+    .legend-color.next {
+      background: var(--brand-cyan);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      .gantt-sidebar {
+        min-width: 180px;
+      }
+      .gantt-task {
+        padding: 12px;
+        font-size: 12px;
+      }
+      .header h1 {
+        font-size: 24px;
+      }
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Longleaf Amenity — Construction Schedule</h1>
+      <p>Project Timeline & Milestone Tracking</p>
+    </div>
+
+    <div class="controls">
+      <button class="active" onclick="filterGantt('all')">All Tasks</button>
+      <button onclick="filterGantt('active')">In Progress</button>
+      <button onclick="filterGantt('done')">Completed</button>
+      <button onclick="filterGantt('next')">Upcoming</button>
+    </div>
+
+    <div class="gantt-wrapper">
+      <div class="gantt">
+        <div class="gantt-sidebar">
+          <div class="gantt-header">Task</div>
+          <div id="tasks-list"></div>
+        </div>
+        <div class="gantt-chart">
+          <div style="position: absolute; top: 0; left: 0; right: 0;">
+            <div class="gantt-month-labels" id="month-labels"></div>
+          </div>
+          <div style="position: absolute; top: 40px; left: 0; right: 0; bottom: 0; width: 100%;">
+            <div id="timeline-content" style="position: relative; width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Project Duration</div>
+        <div class="stat-value">18 mo</div>
+        <div class="stat-sub">Mar 2025 → Oct 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasks Completed</div>
+        <div class="stat-value" id="completed-count">3</div>
+        <div class="stat-sub">of 9 total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Progress</div>
+        <div class="stat-value" id="progress-pct">33%</div>
+        <div class="stat-sub">On schedule</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Current Phase</div>
+        <div class="stat-value" id="current-phase" style="font-size: 16px;">Drywall</div>
+        <div class="stat-sub">In progress</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color done"></div>
+        <span>Completed</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color active"></div>
+        <span>In Progress</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color next"></div>
+        <span>Upcoming</span>
+      </div>
+      <div class="legend-item">
+        <div style="width: 2px; height: 16px; background: var(--err);"></div>
+        <span>Today</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DR = {
+      gantt: [
+        {t:'Pour Slab',            s:1.2, e:1.6,  status:'done'},
+        {t:'Flashing & Dry In',    s:1.6, e:5.0,  status:'done'},
+        {t:'MEPS Complete',        s:5.0, e:7.4,  status:'done'},
+        {t:'Drywall Complete',     s:7.4, e:10.2, status:'active'},
+        {t:'Install Cabinets',     s:10.2,e:12.1, status:'next'},
+        {t:'Complete Countertops', s:12.1,e:13.3, status:'next'},
+        {t:'MEP Trim Complete',    s:13.3,e:14.6, status:'next'},
+        {t:'Exterior Finishes',    s:14.6,e:16.5, status:'next'},
+        {t:'House Complete',       s:16.5,e:19.0, status:'next'},
+      ],
+      ganttMonths: ['Mar','May','Jul','Sep','Nov','Jan','Mar','May','Jul','Sep'],
+      todayPos: 10.4
+    };
+
+    const totalMonths = 20;
+    let filterMode = 'all';
+
+    function renderMonthLabels() {
+      const container = document.getElementById('month-labels');
+      container.innerHTML = '';
+      DR.ganttMonths.forEach((m, i) => {
+        const el = document.createElement('div');
+        el.className = 'gantt-month';
+        el.style.flex = '1';
+        el.textContent = m + ' ' + (i < 5 ? '25' : '26');
+        container.appendChild(el);
+      });
+    }
+
+    function renderTasks() {
+      const container = document.getElementById('tasks-list');
+      container.innerHTML = '';
+      const filtered = filterMode === 'all' ? DR.gantt : DR.gantt.filter(t => t.status === filterMode);
+      
+      filtered.forEach(task => {
+        const row = document.createElement('div');
+        row.className = 'gantt-row';
+        row.innerHTML = `
+          <div class="gantt-task">
+            <div class="gantt-task-label">${task.t}</div>
+            <div class="gantt-task-status">${task.status}</div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderChart() {
+      const container = document.getElementById('timeline-content');
+      container.innerHTML = '';
+      const filtered = filterMode === 'all' ? DR.gantt : DR.gantt.filter(t => t.status === filterMode);
+      
+      filtered.forEach(task => {
+        const row = document.createElement('div');
+        row.className = 'gantt-row-content';
+        
+        const startPct = (task.s / totalMonths) * 100;
+        const widthPct = ((task.e - task.s) / totalMonths) * 100;
+        
+        const bar = document.createElement('div');
+        bar.className = `gantt-bar ${task.status}`;
+        bar.style.marginLeft = startPct + '%';
+        bar.style.width = widthPct + '%';
+        bar.textContent = task.t;
+        bar.title = `${task.t} (${task.status})`;
+        
+        row.appendChild(bar);
+        container.appendChild(row);
+      });
+      
+      // Add today line
+      const todayPct = (DR.todayPos / totalMonths) * 100;
+      const todayLine = document.createElement('div');
+      todayLine.className = 'gantt-today';
+      todayLine.style.left = todayPct + '%';
+      const label = document.createElement('div');
+      label.className = 'gantt-today-label';
+      label.textContent = 'Today';
+      todayLine.appendChild(label);
+      container.appendChild(todayLine);
+    }
+
+    function filterGantt(mode) {
+      filterMode = mode;
+      document.querySelectorAll('.controls button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderTasks();
+      renderChart();
+    }
+
+    // Initial render
+    renderMonthLabels();
+    renderTasks();
+    renderChart();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "dun-rite-construction"
+  },
+  "targets": {
+    "dun-rite-construction": {
+      "hosting": {
+        "public": "dist",
+        "ignore": [
+          "firebase.json",
+          "**/.*",
+          "**/node_modules/**"
+        ]
+      }
+    }
+  }
+}

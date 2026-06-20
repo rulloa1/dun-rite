@@ -1,0 +1,47 @@
+/* Line icons — stroke = currentColor */
+const _I = (p) => React.createElement('svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',
+  strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round'}, p.map((d,i)=>
+    typeof d==='string'?React.createElement('path',{key:i,d}):React.createElement(d.tag,{key:i,...d.a})));
+
+const Icon = {
+  dashboard: ()=>_I(['M4 13h7V4H4zM13 20h7v-9h-7zM13 4v5h7V4zM4 20h7v-5H4z']),
+  building:  ()=>_I(['M3 21h18','M5 21V5a1 1 0 011-1h7a1 1 0 011 1v16','M14 9h4a1 1 0 011 1v11',{tag:'path',a:{d:'M8 8h2M8 12h2M8 16h2'}}]),
+  cart:      ()=>_I([{tag:'circle',a:{cx:9,cy:20,r:1.4}},{tag:'circle',a:{cx:18,cy:20,r:1.4}},'M2 3h2.2l2.3 12.4a1.6 1.6 0 001.6 1.3h8.5a1.6 1.6 0 001.6-1.2L21 7H5.3']),
+  gavel:     ()=>_I(['M14 13l-7.5 7.5a2.1 2.1 0 01-3-3L11 10','M10.5 9.5l4 4','M13 4l7 7','M15.5 6.5l-4 4','M14 17h7']),
+  receipt:   ()=>_I(['M5 3v18l2-1.3L9 21l2-1.3L13 21l2-1.3L17 21l2-1.3V3l-2 1.3L15 3l-2 1.3L11 3 9 4.3 7 3z','M9 8h6M9 12h6']),
+  help:      ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M9.5 9.2a2.6 2.6 0 015 .8c0 1.7-2.5 2.2-2.5 4',{tag:'path',a:{d:'M12 17.5h.01'}}]),
+  inbox:     ()=>_I(['M3 12h5l2 3h4l2-3h5','M5.5 5h13l3 7v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z']),
+  clock:     ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M12 7.5V12l3 2']),
+  truck:     ()=>_I(['M3 6h11v9H3z','M14 9h4l3 3v3h-7','M7 18.5a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2M18 18.5a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2']),
+  doc:       ()=>_I(['M7 3h7l5 5v13a0 0 0 010 0H7a1 1 0 01-1-1V4a1 1 0 011-1z','M14 3v5h5','M9 13h6M9 17h6']),
+  edit:      ()=>_I(['M4 20h4L19 9a2 2 0 00-3-3L5 17z','M14 6l4 4']),
+  wallet:    ()=>_I(['M3 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z','M16 11h3v4h-3a2 2 0 010-4z','M3 8h13']),
+  check:     ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M8.5 12.2l2.3 2.3 4.7-4.8']),
+  alert:     ()=>_I(['M12 3l9.5 16.5H2.5z','M12 10v4',{tag:'path',a:{d:'M12 17.5h.01'}}]),
+  search:    ()=>_I([{tag:'circle',a:{cx:11,cy:11,r:7}},'M21 21l-4.3-4.3']),
+  bell:      ()=>_I(['M18 9a6 6 0 10-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9','M13.7 20a2 2 0 01-3.4 0']),
+  download:  ()=>_I(['M12 3v12','M7.5 11l4.5 4 4.5-4','M5 20h14']),
+  mail:      ()=>_I(['M3 6h18v12H3z','M3 7l9 6 9-6']),
+  users:     ()=>_I([{tag:'circle',a:{cx:9,cy:8,r:2.5}},{tag:'path',a:{d:'M4 19a4 4 0 0110 0'}},{tag:'circle',a:{cx:16,cy:8,r:2.5}},{tag:'path',a:{d:'M12 18a3 3 0 018 0'}}]),
+  cal:       ()=>_I(['M4 5h16v15H4z','M4 9h16','M8 3v4M16 3v4']),
+  trend:     ()=>_I(['M3 17l6-6 4 4 8-8','M15 7h6v6']),
+  pin:       ()=>_I(['M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z',{tag:'circle',a:{cx:12,cy:10,r:2.4}}]),
+  chevron:   ()=>_I(['M9 6l6 6-6 6']),
+  flag:      ()=>_I(['M5 21V4','M5 4h11l-2 4 2 4H5']),
+  layers:    ()=>_I(['M12 3l9 5-9 5-9-5z','M3 13l9 5 9-5','M3 18l9 5 9-5']),
+  logout:    ()=>_I(['M10 8V5a1 1 0 011-1h9a1 1 0 011 1v14a1 1 0 01-1 1h-9a1 1 0 01-1-1v-3','M3 12h11','M8 9l-3 3 3 3']),
+  file:      ()=>_I(['M7 3h10l3 3v13a1 1 0 01-1 1H8a1 1 0 01-1-1V4a1 1 0 011-1z','M14 3v3h3','M9 10h6M9 14h6']),
+  clipboard: ()=>_I(['M9 3h6v2H9z','M5 5h14v15H5z','M9 9h6M9 13h6M9 17h4']),
+  chart:     ()=>_I(['M3 19h18','M8 19V9M14 19v-7M20 19V7']),
+  receipt:   ()=>_I(['M5 3v18l2-1.3L9 21l2-1.3L13 21l2-1.3L17 21l2-1.3V3l-2 1.3L15 3l-2 1.3L11 3 9 4.3 7 3z','M9 8h6M9 12h6']),
+  image:     ()=>_I(['M3 7a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1z',{tag:'circle',a:{cx:8,cy:9,r:1.5}},'M3 17l4-4 5 5 8-8']),
+  trending:  ()=>_I(['M3 17l6-6 4 4 8-8M19 7h4v4']),
+  lock:      ()=>_I(['M6 9V7a6 6 0 0112 0v2','M6 9h12v9a1 1 0 01-1 1H7a1 1 0 01-1-1z',{tag:'circle',a:{cx:12,cy:13,r:1}}]),
+  target:    ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},{tag:'circle',a:{cx:12,cy:12,r:5}},{tag:'circle',a:{cx:12,cy:12,r:1}}]),
+  zap:       ()=>_I(['M13 2l3 5h6l-4.5 4 1.5 6-5-4-5 4 1.5-6L1 7h6L13 2']),
+  phone:     ()=>_I(['M17 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2z',{tag:'path',a:{d:'M12 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3'}}]),
+  calendar:  ()=>_I(['M4 5h16v15H4z','M4 9h16','M8 3v4M16 3v4']),
+  calculator:()=>_I(['M4 3h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z','M8 9h8M8 13H6v4h2M14 13h-2v4h2M10 13h-2v4h2']),
+  cloud:     ()=>_I(['M19.35 10.04a7 7 0 00-12.6-3.5A4 4 0 003 19h17.5z'])
+};
+window.Icon = Icon;

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dun Rite — Owner &amp; Company Records Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Expanded:wght@600;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-cyan:#1DB4E8;
+  --brand-blue:#1583C7;
+  --navy:#142130;
+  --navy-deep:#0E1A28;
+  --ink:#16212E;
+  --ink-2:#3C4A5A;
+  --muted:#6A7889;
+  --faint:#9AA7B4;
+  --line:#E4E9EE;
+  --line-soft:#EEF2F6;
+  --paper:#F4F7FA;
+  --card:#FFFFFF;
+  --ok:#1E9E6A;
+  --warn:#E08A1E;
+  --r:12px; --r-lg:18px;
+  --font-display:'Archivo Expanded','Archivo',sans-serif;
+  --font-body:'Public Sans',system-ui,sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding:32px 20px;
+  display:flex;
+  justify-content:center;
+}
+.page{
+  width:8.5in;
+  min-height:11in;
+  background:var(--card);
+  box-shadow:0 18px 48px rgba(13,30,48,.14);
+  border-radius:6px;
+  overflow:hidden;
+}
+.head{
+  background:linear-gradient(135deg,var(--navy-deep),var(--navy) 70%);
+  color:#fff;
+  padding:30px 44px 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.head__mark{display:flex;align-items:center;gap:16px}
+.logo{
+  width:48px;height:48px;border-radius:11px;
+  background:var(--brand-cyan);
+  display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:800;font-size:26px;color:#fff;
+  box-shadow:0 6px 18px rgba(29,180,232,.4);
+}
+.head h1{
+  font-family:var(--font-display);font-weight:800;
+  font-size:23px;letter-spacing:-.01em;line-height:1.05;
+}
+.head .sub{font-size:12px;color:#9FB3C6;letter-spacing:.04em;margin-top:3px;text-transform:uppercase;font-weight:600}
+.head__tag{text-align:right;font-size:11px;color:#8AA0B5;line-height:1.5}
+.head__tag b{color:var(--brand-cyan);font-weight:700;display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+
+.body{padding:32px 44px 40px}
+.intro{font-size:13.5px;color:var(--ink-2);line-height:1.6;max-width:64ch;margin-bottom:26px}
+.intro b{color:var(--ink)}
+
+.sect-label{
+  font-family:var(--font-display);font-weight:700;
+  font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--navy);
+  display:flex;align-items:center;gap:10px;margin:0 0 14px;
+}
+.sect-label::before{content:"";width:22px;height:3px;background:var(--brand-cyan);border-radius:2px}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+
+.tree{
+  font-family:var(--font-mono);font-size:12px;line-height:1.95;
+  background:#fff;border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 20px;
+}
+.tree .row{display:flex;align-items:baseline;white-space:nowrap}
+.tree .fold{color:var(--navy);font-weight:500}
+.tree .root{color:var(--brand-blue);font-weight:500}
+.tree .ind{color:var(--faint)}
+.tree .note{color:var(--muted);font-family:var(--font-body);font-size:10px;margin-left:7px;font-style:italic}
+.tree .l2{padding-left:16px}
+
+.card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;margin-bottom:12px;
+}
+.card h3{font-size:12.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.card h3 .n{width:19px;height:19px;border-radius:5px;background:var(--brand-cyan);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.card p{font-size:11.5px;color:var(--ink-2);line-height:1.5}
+.card code{font-family:var(--font-mono);font-size:11px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--brand-blue);font-weight:500;white-space:nowrap}
+
+/* Sensitivity / access strip */
+.access{
+  margin-top:30px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+}
+.access__head{
+  background:var(--navy);color:#fff;padding:11px 20px;
+  font-family:var(--font-display);font-weight:700;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;
+}
+.access__grid{display:grid;grid-template-columns:1fr 1fr 1fr}
+.acell{padding:15px 18px}
+.acell+.acell{border-left:1px solid var(--line)}
+.tier{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.acell p{font-size:11px;color:var(--ink-2);line-height:1.5}
+.acell .who{font-size:10px;color:var(--muted);margin-top:6px;font-weight:600}
+
+.foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:10.5px;color:var(--faint);
+}
+.foot b{color:var(--muted);font-weight:600}
+
+@media print{
+  body{padding:0;background:#fff}
+  .page{box-shadow:none;border-radius:0;width:100%;min-height:0}
+  @page{size:letter;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <div class="head__mark">
+      <div class="logo">DC</div>
+      <div>
+        <h1>Owner &amp; Company Records</h1>
+        <div class="sub">Executive File Organization Standard</div>
+      </div>
+    </div>
+    <div class="head__tag">
+      <b>Dun Rite</b>
+      Construction Group LLC<br>
+      Rev. 2026.06
+    </div>
+  </header>
+
+  <div class="body">
+    <p class="intro">
+      Owner-level files are <b>company records</b>, not job files — legal, financial, and HR documents that
+      run the business. Keep them in their own top-level folder, restrict access, and group by function so
+      tax time, audits, and renewals are a five-minute pull, not a scramble.
+    </p>
+
+    <div class="cols">
+      <div>
+        <div class="sect-label">Owner / Company Tree</div>
+        <div class="tree">
+          <div class="row"><span class="root">📁 03_Company/</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">01_Legal &amp; Formation</span><span class="note">LLC, EIN, operating agr.</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">02_Licenses &amp; Bonds</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">03_Insurance</span><span class="note">GL, WC, auto, umbrella</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">04_Financials</span><span class="note">P&amp;L, balance sheets</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">05_Banking &amp; Loans</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">06_Taxes</span><span class="note">by year</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">07_Payroll &amp; HR</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">08_Vehicles &amp; Equipment</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">09_Vendors &amp; Subs</span><span class="note">W-9s, COIs</span></div>
+          <div class="row l2"><span class="ind">└─ </span><span class="fold">10_Owner Personal</span><span class="note">private — owner only</span></div>
+        </div>
+        <p class="intro" style="margin-top:14px;margin-bottom:0;font-size:12px">
+          Inside <b>06_Taxes</b> and <b>04_Financials</b>, add a folder per year
+          (<code>2024</code>, <code>2025</code>, <code>2026</code>) so records archive themselves.
+        </p>
+      </div>
+
+      <div>
+        <div class="sect-label">Owner Rules</div>
+        <div class="card">
+          <h3><span class="n">1</span>Separate company from personal</h3>
+          <p>Business records live in <code>03_Company</code>. Anything personal goes in <code>10_Owner Personal</code> — never mixed.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">2</span>Group by function, then year</h3>
+          <p>Function first (<code>06_Taxes</code>), year subfolder second (<code>2025</code>). Renewals and audits pull instantly.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">3</span>Track expirations</h3>
+          <p>Name renewable docs with their expiry: <code>GL-Policy_exp-2026-12-31.pdf</code>.</p>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="n">4</span>Lock down access</h3>
+          <p>Share <code>03_Company</code> with the owner &amp; bookkeeper only — never the project team.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="access">
+      <div class="access__head">Who Can See What</div>
+      <div class="access__grid">
+        <div class="acell">
+          <div class="tier"><span class="dot" style="background:#E0524B"></span>Owner Only</div>
+          <p>Personal files, owner draws, sensitive legal &amp; banking logins.</p>
+          <div class="who">10_Owner Personal · 05_Banking</div>
+        </div>
+        <div class="acell">
+          <div class="tier"><span class="dot" style="background:var(--warn)"></span>Owner + Bookkeeper</div>
+          <p>Financials, taxes, payroll, insurance, all company formation docs.</p>
+          <div class="who">Most of 03_Company</div>
+        </div>
+        <div class="acell">
+          <div class="tier"><span class="dot" style="background:var(--ok)"></span>Team Visible</div>
+          <p>Current COIs, license numbers, and vendor W-9s the field needs.</p>
+          <div class="who">Shared copies only</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>Pairs with the <b>Dropbox Folder Guide</b> — project files in <b>01_Active</b>, company records here.</span>
+      <span><b>Dun Rite Construction Group LLC</b></span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

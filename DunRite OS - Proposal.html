@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proposal — DunRite Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0C1622; --navy:#16304A; --cyan:#1DB4E8; --gold:#D09527;
+    --paper:#F4F7FA; --ink:#15222E; --ink2:#2C3D4B; --muted:#5B6B79; --faint:#8A98A4;
+    --line:#E2E8EE; --line-soft:#EDF1F5; --ok:#1E9E6A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#D8DEE5;font-family:'Public Sans',system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;padding:32px 16px;}
+  .page{
+    width:8.5in;min-height:11in;margin:0 auto;background:#fff;
+    box-shadow:0 8px 36px rgba(13,30,48,.18);position:relative;overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  /* header */
+  .head{background:linear-gradient(135deg,var(--navy-deep),var(--navy));color:#fff;padding:34px 48px 26px;position:relative;overflow:hidden;}
+  .head::after{content:"";position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(29,180,232,.26)0%,transparent 64%);}
+  .brandrow{display:flex;justify-content:space-between;align-items:flex-start;position:relative;}
+  .wordmark{font-family:'Archivo',sans-serif;font-weight:900;font-size:19px;letter-spacing:.16em;text-transform:uppercase;line-height:1;}
+  .wordmark .dot{color:var(--cyan);}
+  .vend-sub{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#9FB3C6;margin-top:7px;text-transform:uppercase;}
+  .meta{text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:#9FB3C6;line-height:1.7;}
+  .title{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.01em;line-height:1.05;margin:24px 0 6px;position:relative;}
+  .subtitle{font-size:13.5px;color:#AFC0D0;position:relative;max-width:78%;line-height:1.5;}
+  /* body */
+  .body{padding:30px 48px 0;flex:1;}
+  .to-row{display:flex;justify-content:space-between;gap:24px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px;}
+  .to-row .lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;}
+  .to-row .val{font-size:13.5px;color:var(--ink);font-weight:600;line-height:1.45;}
+  .to-row .val span{display:block;font-weight:400;color:var(--muted);font-size:12.5px;}
+  p.lead{font-size:13px;line-height:1.62;color:var(--ink2);margin:0 0 22px;}
+  h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin:0 0 12px;display:flex;align-items:center;gap:9px;}
+  h2::before{content:"";width:14px;height:3px;border-radius:2px;background:var(--cyan);}
+  .section{margin-bottom:24px;}
+  /* scope */
+  .scope{display:grid;grid-template-columns:1fr 1fr;gap:7px 26px;}
+  .scope .item{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--ink2);line-height:1.4;}
+  .scope .item .ck{color:var(--ok);font-weight:800;flex:none;margin-top:1px;}
+  /* investment table */
+  table{width:100%;border-collapse:collapse;}
+  .inv th{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-align:left;padding:0 0 9px;font-weight:500;}
+  .inv th.r,.inv td.r{text-align:right;}
+  .inv td{padding:10px 0;border-top:1px solid var(--line-soft);font-size:12.5px;color:var(--ink2);vertical-align:top;}
+  .inv td .nm{font-weight:700;color:var(--ink);font-size:13px;}
+  .inv td .ds{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .inv td.amt{font-family:'DM Mono',monospace;font-weight:500;color:var(--ink);white-space:nowrap;font-size:13px;}
+  .inv tr.sub td{border-top:2px solid var(--line);font-weight:800;color:var(--ink);padding-top:12px;}
+  .inv tr.sub td.amt{color:var(--navy);font-size:15px;}
+  .inv tr.recur td{border-top:1px dashed var(--line);}
+  .inv tr.recur td.amt{color:var(--cyan);font-weight:600;}
+  .pillnote{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);background:rgba(208,149,39,.10);border-radius:5px;padding:2px 7px;margin-left:8px;letter-spacing:.02em;vertical-align:middle;}
+  /* two-col bottom */
+  .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:30px;}
+  ol.sched{margin:0;padding:0;list-style:none;counter-reset:s;}
+  ol.sched li{counter-increment:s;display:flex;gap:11px;align-items:flex-start;font-size:12px;color:var(--ink2);line-height:1.45;margin-bottom:10px;}
+  ol.sched li::before{content:counter(s);flex:none;width:19px;height:19px;border-radius:6px;background:rgba(29,180,232,.12);color:var(--navy);font-family:'Archivo';font-weight:800;font-size:11px;display:grid;place-items:center;margin-top:1px;}
+  ol.sched li b{color:var(--ink);}
+  ul.out{margin:0;padding:0;list-style:none;}
+  ul.out li{font-size:11.5px;color:var(--muted);line-height:1.45;padding-left:15px;position:relative;margin-bottom:7px;}
+  ul.out li::before{content:"–";position:absolute;left:0;color:var(--faint);}
+  /* footer / sign */
+  .foot{margin-top:auto;padding:22px 48px 30px;border-top:1px solid var(--line);}
+  .sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:6px;}
+  .sigline{border-top:1.5px solid var(--ink);padding-top:7px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+  .accept{font-family:'Archivo';font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);margin-bottom:30px;}
+  .fineprint{font-size:10px;color:var(--faint);line-height:1.5;margin-top:20px;}
+  @media print{
+    body{background:#fff;padding:0;}
+    .page{box-shadow:none;width:100%;min-height:0;margin:0;}
+    @page{size:letter;margin:0;}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="head">
+      <div class="brandrow">
+        <div>
+          <div class="wordmark">The Roy Effect<span class="dot">.</span></div>
+          <div class="vend-sub">Construction Technology · theroyeffect.com</div>
+        </div>
+        <div class="meta">
+          PROPOSAL № TRE-2026-014<br>
+          June 20, 2026<br>
+          Valid 30 days
+        </div>
+      </div>
+      <div class="title">The DunRite Operating System</div>
+      <div class="subtitle">A custom, end-to-end operations platform built around how DunRite actually runs jobs — design, build, integrate, deploy, and maintain.</div>
+    </header>
+
+    <div class="body">
+      <div class="to-row">
+        <div>
+          <div class="lbl">Prepared for</div>
+          <div class="val">DunRite Construction Group<span>Attn: Jerry Ruskin, Owner</span></div>
+        </div>
+        <div>
+          <div class="lbl">Prepared by</div>
+          <div class="val">Rory Ulloa — The Roy Effect<span>Construction Technology Specialist</span></div>
+        </div>
+        <div>
+          <div class="lbl">Engagement</div>
+          <div class="val">Custom build + ongoing support<span>Fixed fee · monthly retainer</span></div>
+        </div>
+      </div>
+
+      <p class="lead">DunRite needs one place to run the business — projects, schedule, budgets, commitments, billing, compliance, and closeout — without paying enterprise per-seat pricing for tools that don't fit. The DunRite OS is that system, tailored to your workflow and connected to the accounting and document tools you already use. This proposal covers hardening the platform for daily use, loading your real data, wiring your integrations, deploying to your domain, training your team, and keeping it running.</p>
+
+      <div class="section">
+        <h2>What's included</h2>
+        <div class="scope">
+          <div class="item"><span class="ck">✓</span><span>Portfolio &amp; project management dashboard</span></div>
+          <div class="item"><span class="ck">✓</span><span>Schedule, budget &amp; schedule-of-values tracking</span></div>
+          <div class="item"><span class="ck">✓</span><span>Commitments, directory, bidding &amp; meetings</span></div>
+          <div class="item"><span class="ck">✓</span><span>Inspections, daily logs &amp; photo records</span></div>
+          <div class="item"><span class="ck">✓</span><span>Invoicing &amp; change-order routing with approvals</span></div>
+          <div class="item"><span class="ck">✓</span><span>Subcontractor insurance compliance + auto-reminders</span></div>
+          <div class="item"><span class="ck">✓</span><span>Owner Profit Advisor (AI) — money-focused guidance</span></div>
+          <div class="item"><span class="ck">✓</span><span>Three-phase automatic job reconciliation at closeout</span></div>
+          <div class="item"><span class="ck">✓</span><span>QuickBooks, Microsoft 365, Dropbox &amp; Sheets links</span></div>
+          <div class="item"><span class="ck">✓</span><span>Role-based access &amp; email notifications</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Investment</h2>
+        <table class="inv">
+          <thead><tr><th>Item</th><th class="r">Amount</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="nm">Platform build &amp; hardening</div><div class="ds">Production-ready setup, your data loaded, secure sign-in, deploy to dunriteconstruction.app</div></td>
+              <td class="amt r">$24,000</td>
+            </tr>
+            <tr>
+              <td><div class="nm">Integrations setup</div><div class="ds">QuickBooks Online, Microsoft 365, Dropbox &amp; Google Sheets + email notification backend</div></td>
+              <td class="amt r">$4,500</td>
+            </tr>
+            <tr>
+              <td><div class="nm">Onboarding &amp; training</div><div class="ds">Team walkthroughs, owner Advisor setup, documentation</div></td>
+              <td class="amt r">$2,500</td>
+            </tr>
+            <tr class="sub"><td>One-time total</td><td class="amt r">$31,000</td></tr>
+            <tr class="recur">
+              <td><div class="nm">Care plan <span class="pillnote">recurring</span></div><div class="ds">Hosting, monitoring, support &amp; up to 8 hrs/mo of changes &amp; new features</div></td>
+              <td class="amt r">$2,000<span style="font-size:11px;color:var(--muted);">/mo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cols">
+        <div class="section" style="margin-bottom:0;">
+          <h2>Payment schedule</h2>
+          <ol class="sched">
+            <li><span><b>50% deposit — $15,500.</b> Due on signing; work begins.</span></li>
+            <li><span><b>25% — $7,750.</b> At data migration &amp; integrations complete.</span></li>
+            <li><span><b>25% — $7,750.</b> At go-live &amp; team training.</span></li>
+            <li><span><b>Care plan — $2,000/mo.</b> Begins at go-live, billed monthly.</span></li>
+          </ol>
+        </div>
+        <div class="section" style="margin-bottom:0;">
+          <h2>Not included</h2>
+          <ul class="out">
+            <li>Third-party fees (Firebase, Resend, QuickBooks, domain)</li>
+            <li>Net-new modules beyond the scope above (quoted separately)</li>
+            <li>Historical data entry beyond the agreed migration set</li>
+            <li>On-site visits (remote delivery; on-site by arrangement)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="foot">
+      <div class="accept">Acceptance</div>
+      <div class="sign">
+        <div class="sigline">DunRite Construction Group — signature &amp; date</div>
+        <div class="sigline">The Roy Effect — signature &amp; date</div>
+      </div>
+      <div class="fineprint">This proposal is a starting framework and is open to adjustment in scope and price. Pricing assumes the platform is built on the existing DunRite OS foundation. A separate services agreement will govern the engagement. Questions: Rory Ulloa · The Roy Effect · theroyeffect.com</div>
+    </footer>
+  </div>
+</body>
+</html>

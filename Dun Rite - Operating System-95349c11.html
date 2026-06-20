@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dun Rite — Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Expanded:wght@700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Public Sans',system-ui,sans-serif;background:#0E1A28;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  #root{height:100%}
+  button{font-family:inherit}
+  ::selection{background:rgba(29,180,232,.25)}
+  input,textarea{font-family:inherit}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,140,160,.35);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes drslide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes drKenBurns{0%{transform:scale(1.06) translate(0,0)}50%{transform:scale(1.13) translate(-1.6%,-1.1%)}100%{transform:scale(1.06) translate(0,0)}}
+  @keyframes drZoomIn{from{transform:scale(1.0)}to{transform:scale(1.16)}}
+  @media (prefers-reduced-motion: reduce){ .dr-kb{animation:none !important} }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<rect width="200" height="200" fill="#0E1A28"/>
+<rect x="60" y="60" width="80" height="80" rx="14" fill="#1DB4E8"/>
+<text x="100" y="100" font-family="Archivo, sans-serif" font-size="42" font-weight="900" fill="#0E1A28" text-anchor="middle" dominant-baseline="central">DR</text>
+</svg>
+</template>
+<div id="root"></div>
+<!-- shared data store (plain JS) -->
+<script src="os/store.js"></script>
+<!-- live sync (optional): Firebase Realtime DB. Stays in local mode until os/sync-config.js is filled in. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="os/sync-config.js"></script>
+<script src="os/sync.js"></script>
+<script src="os/sheets.js"></script>
+<script src="os/dropbox.js"></script>
+<script src="os/auth.js"></script>
+<!-- shared primitives (DRtok, Kpi, Card, Pill, Bar, Avatar, icons, circ) -->
+<script type="text/babel" src="concepts-shared.jsx"></script>
+<!-- views -->
+<script type="text/babel" src="os/views-home.jsx"></script>
+<script type="text/babel" src="os/views-project.jsx"></script>
+<script type="text/babel" src="os/views-docs.jsx"></script>
+<script type="text/babel" src="os/views-modules.jsx"></script>
+<script type="text/babel" src="os/views-schedule.jsx"></script>
+<script type="text/babel" src="os/views-budget.jsx"></script>
+<!-- tweaks panel (host protocol + controls) -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<!-- shell renders the app -->
+<script type="text/babel" src="os/shell.jsx"></script>
+</body>
+</html>

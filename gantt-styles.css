@@ -1,0 +1,365 @@
+/* Gantt Chart Styles */
+
+.gantt-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.gantt-header {
+  padding: 20px 32px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gantt-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gantt-timeline-info {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gantt-timeline-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.critical-indicator {
+  color: var(--bad) !important;
+  font-weight: 600;
+}
+
+.gantt-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+.gantt-tasks {
+  flex: 0 0 400px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: var(--card);
+  overflow: hidden;
+}
+
+.gantt-tasks-header {
+  display: grid;
+  grid-template-columns: 1fr 100px 60px 80px;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gantt-tasks-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gantt-task-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 60px 80px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+  align-items: center;
+}
+
+.gantt-task-row:hover {
+  background: var(--paper);
+}
+
+.gantt-task-row.is-selected {
+  background: rgba(21, 131, 199, 0.1);
+  border-left: 3px solid var(--brand-blue);
+}
+
+.gantt-task-row.is-critical {
+  font-weight: 600;
+  border-left: 3px solid var(--bad);
+}
+
+.task-name-col {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-trade-col,
+.task-duration-col {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.task-progress-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1DB4E8, #1382bf);
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+.milestone-marker::before {
+  content: '◆ ';
+  color: var(--warn);
+  font-weight: bold;
+}
+
+/* Timeline */
+
+.gantt-timeline {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--paper);
+}
+
+.gantt-timeline-header {
+  flex: 0 0 auto;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.timeline-months {
+  display: flex;
+  height: 40px;
+}
+
+.timeline-month {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.gantt-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  background: var(--card);
+}
+
+.gantt-task-bar-row {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.gantt-bar {
+  background: linear-gradient(135deg, #1DB4E8, #15a3d9);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.gantt-bar:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+
+.gantt-bar.scheduled {
+  background: linear-gradient(135deg, #1DB4E8, #15a3d9);
+}
+
+.gantt-bar.in-progress {
+  background: linear-gradient(135deg, #1FD9A6, #17a973);
+}
+
+.gantt-bar.completed {
+  background: linear-gradient(135deg, #888, #666);
+  opacity: 0.7;
+}
+
+.gantt-bar.on-hold {
+  background: linear-gradient(135deg, #E08A1E, #d67f1a);
+}
+
+.gantt-bar.delayed {
+  background: linear-gradient(135deg, #E05247, #cc3d3a);
+}
+
+.gantt-bar.critical {
+  box-shadow: 0 0 0 2px var(--bad), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-indicator {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Task Details */
+
+.gantt-details {
+  flex: 0 0 280px;
+  background: var(--card);
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.details-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.details-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  color: var(--ink);
+}
+
+.details-content {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.detail-field label {
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-field p,
+.detail-field span {
+  color: var(--muted);
+  margin: 0;
+}
+
+.detail-field input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.status-badge.scheduled {
+  background: var(--idle-bg);
+  color: var(--idle);
+}
+
+.status-badge.in-progress {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.status-badge.completed {
+  background: var(--paper);
+  color: var(--muted);
+}
+
+.status-badge.on-hold {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.status-badge.delayed {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+.critical-warning {
+  padding: 10px 12px;
+  background: var(--bad-bg);
+  border: 1px solid var(--bad);
+  border-radius: var(--r);
+  color: var(--bad);
+  font-size: 12px;
+  font-weight: 600;
+}

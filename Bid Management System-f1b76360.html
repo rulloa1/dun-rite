@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DunRite — Bid Management System</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="bid-styles.css">
+  <style>
+    body { background: var(--paper); }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- Core dependencies -->
+  <script src="longleaf-data.js"></script>
+  <script src="bid-data-model.js"></script>
+  <script src="bid-workflow.js"></script>
+  <script src="bid-pdf-export.js"></script>
+  <script src="bid-excel-integration.js"></script>
+  
+  <!-- Components -->
+  <script type="text/babel" src="bid-form-view.jsx"></script>
+  <script type="text/babel" src="bid-form-enhanced.jsx"></script>
+  <script type="text/babel" src="views_bids_enhanced_v2.jsx"></script>
+
+  <script type="text/babel">
+    // Comprehensive Bid Management Dashboard
+    function ComprehensiveBidsApp() {
+      const P = window.PROJECT;
+      const [bids, setBids] = React.useState(
+        P.bids.map(b => window.BidDataModel.createEmptyBid(P.name, 'BID-' + b.id, b))
+      );
+      const [viewMode, setViewMode] = React.useState('dashboard'); // dashboard, form, analytics
+      const [selectedBidId, setSelectedBidId] = React.useState(null);
+      const [currentUser, setCurrentUser] = React.useState('PM');
+      const [searchQuery, setSearchQuery] = React.useState('');
+
+      const selectedBid = bids.find(b => b.id === 'BID-' + selectedBidId);
+
+      const handleSaveBid = (updatedBid) => {
+        const index = bids.findIndex(b => b.id === updatedBid.id);
+        if (index >= 0) {
+          const newBids = [...bids];
+          newBids[index] = updatedBid;
+          setBids(newBids);
+        } else {
+          setBids([...bids, updatedBid]);
+        }
+        setViewMode('dashboard');
+        setSelectedBidId(null);
+      };
+
+      const handleExportAll = () => {
+        window.BidExcelIntegration.exportAllData(bids, P.name);
+      };
+
+      const filteredBids = bids.filter(b => 
+        b.vendor?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.trade?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.id.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const usd = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
+      // KPI Component
+      const KPI = ({ label, value, subtext, tone }) =>
+        React.createElement('div', { className: 'kpi kpi--' + tone },
+          React.createElement('div', { className: 'kpi__label' }, label),
+          React.createElement('div', { className: 'kpi__val' }, value),
+          subtext && React.createElement('div', { className: 'kpi__sub' }, subtext)
+        );
+
+      const returned = P.bids.filter(b => b.status === 'Done').length;
+      const pending = P.bids.filter(b => b.status === 'Not Returned').length;
+
+      // Dashboard View
+      const DashboardView = () => React.createElement('div', { className: 'view' },
+        React.createElement('div', { className: 'pg-grid' },
+          // Header with controls
+          React.createElement('div', { style: { padding: '0 32px', marginTop: 20 } },
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 } },
+              React.createElement('h2', { style: { margin: 0, fontSize: 28, fontWeight: 700 } }, P.name + ' — Bid Management'),
+              React.createElement('div', { style: { display: 'flex', gap: 8 } },
+                React.createElement('input', {
+                  type: 'text',
+                  placeholder: 'Search bids...',
+                  value: searchQuery,
+                  onChange: (e) => setSearchQuery(e.target.value),
+                  style: { padding: '8px 12px', border: '1px solid var(--line)', borderRadius: 'var(--r)', fontSize: 13 }
+                }),
+                React.createElement('select', {
+                  value: currentUser,
+                  onChange: (e) => setCurrentUser(e.target.value),
+                  style: { padding: '8px 12px', border: '1px solid var(--line)', borderRadius: 'var(--r)', fontSize: 13 }
+                },
+                  React.createElement('option', { value: 'PM' }, 'View as: PM'),
+                  React.createElement('option', { value: 'Finance' }, 'View as: Finance'),
+                  React.createElement('option', { value: 'Owner' }, 'View as: Owner')
+                ),
+                React.createElement('button', {
+                  className: 'btn btn--primary',
+                  onClick: handleExportAll,
+                  style: { fontSize: 12 }
+                }, '⬇ Export All')
+              )
+            )
+          ),
+
+          // KPIs
+          React.createElement('div', { className: 'pg-row' },
+            KPI('Total Bids', P.bids.length, 'vendors', 'cyan'),
+            KPI('Total Value', P.usd(P.total), 'all bids', 'gold'),
+            KPI('Returned', returned, 'of ' + P.bids.length, 'ok'),
+            KPI('Pending', pending, 'awaiting response', 'warn')
+          ),
+
+          // Bid Summary Tables
+          React.createElement('div', { className: 'pg-row cols-2', style: { marginTop: 20 } },
+            React.createElement('div', { className: 'card' },
+              React.createElement('div', { className: 'card__h' },
+                React.createElement('h3', null, 'Returned Bids'),
+                React.createElement('span', { className: 'card__badge' }, returned)
+              ),
+              React.createElement('div', { className: 'tbl-wrap' },
+                React.createElement('table', { className: 'tbl' },
+                  React.createElement('thead', null,
+                    React.createElement('tr', null,
+                      React.createElement('th', null, 'Vendor'),
+                      React.createElement('th', null, 'Trade'),
+                      React.createElement('th', { style: { textAlign: 'right', width: 120 } }, 'Amount'),
+                      React.createElement('th', { style: { width: 80 } }, 'Action')
+                    )
+                  ),
+                  React.createElement('tbody', null,
+                    P.bids.filter(b => b.status === 'Done').map(b =>
+                      React.createElement('tr', { key: b.id },
+                        React.createElement('td', null, b.vendor),
+                        React.createElement('td', { style: { color: 'var(--muted)', fontSize: 12 } }, b.trade),
+                        React.createElement('td', { className: 'num' }, P.usd(b.amt)),
+                        React.createElement('td', null,
+                          React.createElement('button', {
+                            className: 'btn btn--sm',
+                            onClick: () => {
+                              setSelectedBidId(b.id);
+                              setViewMode('form');
+                            }
+                          }, 'View')
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+
+            React.createElement('div', { className: 'card' },
+              React.createElement('div', { className: 'card__h' },
+                React.createElement('h3', null, 'Pending Bids'),
+                React.createElement('span', { className: 'card__badge' }, pending)
+              ),
+              React.createElement('div', { className: 'tbl-wrap' },
+                React.createElement('table', { className: 'tbl' },
+                  React.createElement('thead', null,
+                    React.createElement('tr', null,
+                      React.createElement('th', null, 'Vendor'),
+                      React.createElement('th', null, 'Trade'),
+                      React.createElement('th', { style: { width: 100 } }, 'Status')
+                    )
+                  ),
+                  React.createElement('tbody', null,
+                    P.bids.filter(b => b.status === 'Not Returned').map(b =>
+                      React.createElement('tr', { key: b.id },
+                        React.createElement('td', null, b.vendor),
+                        React.createElement('td', { style: { color: 'var(--muted)', fontSize: 12 } }, b.trade),
+                        React.createElement('td', null,
+                          React.createElement('span', { style: { padding: '4px 8px', background: 'var(--warn-bg)', color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 11, fontWeight: 600 } }, '⏱ Awaiting')
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      );
+
+      // Form View
+      const FormView = () => selectedBid && React.createElement(EnhancedBidFormView, {
+        bid: selectedBid,
+        onSave: handleSaveBid,
+        onCancel: () => {
+          setViewMode('dashboard');
+          setSelectedBidId(null);
+        },
+        currentUser
+      });
+
+      return React.createElement('div', { className: 'view-container' },
+        viewMode === 'dashboard' && React.createElement(DashboardView),
+        viewMode === 'form' && React.createElement(FormView)
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(ComprehensiveBidsApp));
+  </script>
+</body>
+</html>

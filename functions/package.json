@@ -1,0 +1,11 @@
+{
+  "name": "dunrite-functions",
+  "description": "DunRite OS — notification email sender (Resend)",
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^5.1.0"
+  }
+}

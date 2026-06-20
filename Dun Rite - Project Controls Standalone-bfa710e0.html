@@ -1,0 +1,3257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dun Rite Construction — Project Controls</title>
+  <template id="__bundler_thumbnail" data-bg-color="#0a2540">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="800" fill="#0a2540"/>
+      <g transform="translate(600,400)">
+        <circle cx="0" cy="0" r="80" fill="#1DB4E8" opacity="0.9"/>
+        <text x="0" y="30" font-size="80" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">D</text>
+      </g>
+      <text x="600" y="700" font-size="32" font-weight="600" fill="white" text-anchor="middle" font-family="Arial">Dun Rite Construction</text>
+    </svg>
+  </template>
+  <style>
+/* Design System tokens — DunRite Construction Group */
+:root{
+  /* Brand palette (from design system) */
+  --ds-bg:#080808;
+  --ds-white:#f0ede8;
+  --ds-gold:#D4AF37;
+  --ds-gold-dark:#b8941f;
+  --ds-purple:#9B5DE5;
+  --ds-dim:rgba(240,237,232,0.45);
+  --ds-faint:rgba(240,237,232,0.25);
+  --ds-line:rgba(255,255,255,0.07);
+  --ds-line2:rgba(255,255,255,0.1);
+  
+  /* Extended palette */
+  --ds-ok:#1E9E6A;
+  --ds-warn:#E08A1E;
+  --ds-bad:#E0524B;
+  
+  /* Typography */
+  --ds-font-display:'Bebas Neue',sans-serif;
+  --ds-font-body:'DM Sans',sans-serif;
+  --ds-font-mono:'DM Mono',monospace;
+}
+
+/* ============================================================
+   Dun Rite Construction — Project Controls
+   Design tokens derived from the DunRite logo palette
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Expanded:wght@600;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root{
+  /* Brand */
+  --brand-cyan:#1DB4E8;        /* bright logo blue (accent)        */
+  --brand-blue:#1583C7;        /* deeper action blue               */
+  --brand-blue-700:#0F6BA8;
+  --navy:#142130;              /* logo navy (text on light)        */
+  --navy-deep:#0E1A28;         /* sidebar base                     */
+  --navy-deep-2:#0A1420;       /* sidebar gradient end             */
+
+  /* Neutrals */
+  --ink:#16212E;
+  --ink-2:#3C4A5A;
+  --muted:#6A7889;
+  --faint:#9AA7B4;
+  --line:#E4E9EE;
+  --line-soft:#EEF2F6;
+  --paper:#F4F7FA;            /* app background                    */
+  --card:#FFFFFF;
+  --card-tint:#F8FBFD;
+
+  /* Status */
+  --ok:#1E9E6A;  --ok-bg:#E6F6EE;
+  --warn:#E08A1E; --warn-bg:#FCF3E2;
+  --bad:#E0524B;  --bad-bg:#FBEAE9;
+  --idle:#8493A2; --idle-bg:#EEF2F6;
+
+  /* Legacy aliases (used by CRUD views) */
+  --err:var(--bad); --success:var(--ok);
+  --border:var(--line); --bg:var(--paper); --text:var(--ink); --text-dim:var(--muted);
+
+  /* Effects */
+  --r-sm:8px; --r:12px; --r-lg:18px; --r-xl:24px;
+  --sh-1:0 1px 2px rgba(16,32,48,.05), 0 1px 1px rgba(16,32,48,.04);
+  --sh-2:0 4px 14px rgba(16,32,48,.06), 0 1px 3px rgba(16,32,48,.05);
+  --sh-3:0 18px 48px rgba(13,30,48,.14);
+  --ring:0 0 0 3px rgba(29,180,232,.28);
+
+  --sidebar-w:264px;
+  --topbar-h:68px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Public Sans',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--navy-deep);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+#root{height:100%}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(29,180,232,.25)}
+
+/* tabular numerals everywhere numbers matter */
+.tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.display{font-family:'Archivo Expanded','Archivo',sans-serif;font-weight:800;letter-spacing:-.01em}
+.archivo{font-family:'Archivo',sans-serif}
+
+/* ---------- App frame ---------- */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100%;overflow:hidden}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  background:linear-gradient(180deg,var(--navy-deep),var(--navy-deep-2));
+  color:#C5D2DF;display:flex;flex-direction:column;
+  border-right:1px solid rgba(255,255,255,.05);
+  position:relative;
+}
+.sidebar__brand{display:flex;align-items:center;gap:12px;padding:22px 22px 18px}
+.sidebar__brand img{height:42px;width:auto;display:block}
+.sidebar__sect{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5C6E80;font-weight:700;padding:18px 24px 8px}
+.nav{display:flex;flex-direction:column;gap:2px;padding:0 14px}
+.nav__item{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:transparent;border:0;color:#A9B8C6;
+  padding:11px 12px;border-radius:10px;font-size:14.5px;font-weight:500;
+  transition:background .15s,color .15s;position:relative;
+}
+.nav__item svg{width:19px;height:19px;flex:none;stroke-width:1.8}
+.nav__item:hover{background:rgba(255,255,255,.05);color:#EAF1F7}
+.nav__item.is-active{background:rgba(29,180,232,.14);color:#fff}
+.nav__item.is-active::before{
+  content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;
+  background:var(--brand-cyan);box-shadow:0 0 12px rgba(29,180,232,.8);
+}
+.nav__badge{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.1);color:#cfe; padding:2px 7px;border-radius:20px}
+.nav__item.is-active .nav__badge{background:var(--brand-cyan);color:var(--navy-deep)}
+.sidebar__foot{margin-top:auto;padding:16px 18px;border-top:1px solid rgba(255,255,255,.06)}
+.proj-pill{display:flex;gap:11px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:10px 12px;border-radius:12px}
+.proj-pill__mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand-cyan),var(--brand-blue));display:grid;place-items:center;color:#fff;font-family:'Archivo';font-weight:800;font-size:13px;flex:none}
+.proj-pill__t{font-size:13px;color:#EAF1F7;font-weight:600;line-height:1.25}
+.proj-pill__s{font-size:11.5px;color:#7E8EA0}
+
+/* ---------- Main ---------- */
+.main{background:var(--paper);overflow-y:auto;height:100%;position:relative}
+.topbar{
+  height:var(--topbar-h);position:sticky;top:0;z-index:20;
+  background:rgba(244,247,250,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:18px;padding:0 32px;
+}
+.crumb{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13.5px;font-weight:500}
+.crumb b{color:var(--ink);font-weight:700}
+.crumb svg{width:15px;height:15px;color:var(--faint)}
+.topbar__spacer{flex:1}
+.search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 13px;width:300px;color:var(--muted)}
+.search input{border:0;outline:0;font:inherit;font-size:13.5px;color:var(--ink);width:100%;background:transparent}
+.search svg{width:16px;height:16px;flex:none}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;color:var(--ink-2);position:relative}
+.icon-btn:hover{border-color:var(--brand-cyan);color:var(--brand-blue)}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--bad);border:2px solid #fff}
+.avatar{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--navy),#26425f);color:#fff;display:grid;place-items:center;font-family:'Archivo';font-weight:700;font-size:14px}
+
+.page{padding:30px 32px 64px;max-width:1320px;margin:0 auto}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.page-head h1{font-family:'Archivo';font-weight:800;font-size:30px;letter-spacing:-.025em;color:var(--ink);line-height:1.08}
+.page-head .sub{color:var(--muted);font-size:14px;margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.page-head .sub .chip{display:inline-flex;align-items:center;gap:6px}
+.page-head .sub svg{width:15px;height:15px;color:var(--brand-blue)}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;font-weight:600;font-size:13.5px;padding:10px 16px;border:1px solid transparent;transition:.15s;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn--primary{background:var(--brand-blue);color:#fff;box-shadow:0 1px 2px rgba(21,131,199,.4)}
+.btn--primary:hover{background:var(--brand-blue-700)}
+.btn--ghost{background:#fff;color:var(--ink-2);border-color:var(--line)}
+.btn--ghost:hover{border-color:var(--brand-cyan);color:var(--brand-blue)}
+
+/* ---------- Cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.card__h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
+.card__h h3{font-family:'Archivo';font-weight:700;font-size:15.5px;color:var(--ink);letter-spacing:-.01em}
+.card__h .meta{font-size:12.5px;color:var(--muted);font-weight:600}
+
+/* ---------- Grids ---------- */
+.grid{display:grid;gap:20px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.cols-2-1{grid-template-columns:1.55fr 1fr}
+.cols-2{grid-template-columns:1fr 1fr}
+@media(max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.cols-2-1,.cols-2{grid-template-columns:1fr}}
+
+/* ---------- KPI card ---------- */
+.kpi{padding:18px 18px 16px;position:relative;overflow:hidden}
+.kpi__top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.kpi__ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+.kpi__ico svg{width:18px;height:18px}
+.kpi__label{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.01em}
+.kpi__val{font-family:'Archivo Expanded','Archivo';font-weight:800;font-size:30px;letter-spacing:-.02em;color:var(--ink);line-height:1}
+.kpi__sub{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.delta{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:11.5px;font-weight:700}
+.delta svg{width:12px;height:12px}
+.delta--up{background:var(--ok-bg);color:var(--ok)}
+.delta--down{background:var(--bad-bg);color:var(--bad)}
+.delta--flat{background:var(--idle-bg);color:var(--idle)}
+
+/* ---------- Status pill ---------- */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.01em}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill--ok{background:var(--ok-bg);color:var(--ok)}
+.pill--warn{background:var(--warn-bg);color:var(--warn)}
+.pill--bad{background:var(--bad-bg);color:var(--bad)}
+.pill--idle{background:var(--idle-bg);color:var(--idle)}
+
+/* ---------- Milestone timeline ---------- */
+.mstones{padding:8px 20px 18px}
+.mrow{display:grid;grid-template-columns:30px 1fr auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.mrow:last-child{border-bottom:0}
+.mnum{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:'Archivo';font-weight:700;font-size:13px;flex:none;border:2px solid var(--line)}
+.mrow.done .mnum{background:var(--ok);color:#fff;border-color:var(--ok)}
+.mrow.active .mnum{background:var(--warn);color:#fff;border-color:var(--warn);box-shadow:0 0 0 4px var(--warn-bg)}
+.mrow.next .mnum{background:#fff;color:var(--faint)}
+.mtitle{font-weight:600;font-size:14.5px;color:var(--ink)}
+.mdates{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:12px;flex-wrap:wrap}
+.mdates b{color:var(--ink-2);font-weight:600}
+
+/* ---------- Donut / progress ---------- */
+.donut-wrap{display:flex;align-items:center;gap:22px;padding:16px 20px 20px}
+.donut{position:relative;flex:none}
+.donut__center{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.donut__center .n{font-family:'Archivo Expanded','Archivo';font-weight:800;font-size:30px;color:var(--ink);line-height:1}
+.donut__center .l{font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+.legend{display:flex;flex-direction:column;gap:11px;flex:1}
+.legend__row{display:flex;align-items:center;gap:10px;font-size:13px}
+.legend__sw{width:11px;height:11px;border-radius:3px;flex:none}
+.legend__row .v{margin-left:auto;font-weight:700;color:var(--ink)}
+.legend__row .k{color:var(--ink-2);font-weight:500}
+
+/* ---------- Tables ---------- */
+.tablecard{overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl thead th{
+  text-align:left;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;padding:13px 18px;background:var(--card-tint);border-bottom:1px solid var(--line);position:sticky;top:0
+}
+.tbl tbody td{padding:13px 18px;border-bottom:1px solid var(--line-soft);color:var(--ink-2)}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:var(--card-tint)}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+.tbl .code{font-family:'Archivo';font-weight:700;color:var(--navy);font-size:12.5px}
+.tbl .strong{color:var(--ink);font-weight:600}
+.tbl tr.div td{background:#F0F5FA;font-family:'Archivo';font-weight:800;color:var(--navy);font-size:12.5px;letter-spacing:.02em;text-transform:uppercase}
+.bar-mini{height:7px;border-radius:6px;background:var(--line);overflow:hidden;min-width:90px}
+.bar-mini i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand-blue),var(--brand-cyan))}
+
+/* ---------- Gantt ---------- */
+.gantt{padding:6px 12px 18px}
+.gantt__head{display:grid;grid-template-columns:230px 1fr;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.gantt__months{display:flex}
+.gantt__month{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:10px 0;border-left:1px solid var(--line-soft)}
+.gantt__row{display:grid;grid-template-columns:230px 1fr;align-items:center;min-height:46px;border-bottom:1px solid var(--line-soft)}
+.gantt__row:hover{background:var(--card-tint)}
+.gantt__label{padding:8px 16px 8px 8px;font-size:13.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:10px}
+.gantt__track{position:relative;height:46px}
+.gantt__bar{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:6px;display:flex;align-items:center;min-width:8px}
+.gantt__bar.done{background:linear-gradient(90deg,#1E9E6A,#2ab47c)}
+.gantt__bar.active{background:linear-gradient(90deg,var(--warn),#f0ad4e)}
+.gantt__bar.next{background:repeating-linear-gradient(45deg,#cdd8e2,#cdd8e2 5px,#dbe4ec 5px,#dbe4ec 10px)}
+.gantt__today{position:absolute;top:0;bottom:0;width:2px;background:var(--brand-cyan);z-index:3}
+.gantt__today::after{content:"TODAY";position:absolute;top:-2px;left:4px;font-size:9px;font-weight:800;color:var(--brand-blue);letter-spacing:.05em}
+
+/* ---------- Schedule Gantt (sg) ---------- */
+.sg{border-top:1px solid var(--line-soft);overflow-x:auto}
+.sg__head{display:grid;align-items:stretch;border-bottom:1px solid var(--line);background:#F7FAFC;position:sticky;top:0;z-index:2}
+.sg__corner{padding:11px 16px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-right:1px solid var(--line);display:flex;align-items:center}
+.sg__months{display:flex;position:relative}
+.sg__mon{flex:none;padding:11px 10px;font-size:11.5px;font-weight:800;color:var(--muted);border-right:1px solid var(--line-soft);text-transform:uppercase;letter-spacing:.05em}
+.sg__row{display:grid;align-items:center;border-bottom:1px solid var(--line-soft)}
+.sg__row:hover{background:var(--card-tint)}
+.sg__label{display:flex;align-items:center;gap:11px;padding:7px 16px;border-right:1px solid var(--line);min-height:44px}
+.sg__dot{width:9px;height:9px;border-radius:3px;flex:none;margin-top:1px}
+.sg__name{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.2}
+.sg__code{font-size:10.5px;color:var(--faint);font-weight:700;margin-top:2px;letter-spacing:.02em}
+.sg__track{position:relative;height:44px}
+.sg__grid{position:absolute;top:0;bottom:0;width:1px;background:var(--line-soft)}
+.sg__bar{position:absolute;top:10px;height:24px;border-radius:7px;display:flex;align-items:center;padding:0 9px;font-size:11px;font-weight:800;min-width:8px;overflow:hidden;border:1.5px solid transparent;box-sizing:border-box}
+.sg__bar.is-aw{box-shadow:0 1px 3px rgba(20,33,48,.22)}
+.sg__bar:not(.is-aw){background:#EFF3F8;border-style:dashed}
+.sg__barlbl{white-space:nowrap}
+.sg__legend{display:flex;flex-wrap:wrap;gap:14px;padding:14px 18px;border-top:1px solid var(--line-soft);font-size:12px;font-weight:700;color:var(--muted)}
+.sg__lg{display:inline-flex;align-items:center;gap:7px}
+.sg__sw{width:13px;height:13px;border-radius:4px;display:inline-block;flex:none}
+
+/* ---------- Alerts / list ---------- */
+.alist{padding:6px 8px 10px}
+.aitem{display:flex;gap:13px;padding:12px;border-radius:12px}
+.aitem:hover{background:var(--card-tint)}
+.aico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none}
+.aico svg{width:18px;height:18px}
+.aitem .t{font-size:14px;font-weight:600;color:var(--ink)}
+.aitem .d{font-size:12.5px;color:var(--muted);margin-top:2px}
+.aitem .when{margin-left:auto;font-size:12px;color:var(--faint);white-space:nowrap}
+
+/* progress thin */
+.prog{height:9px;border-radius:8px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--brand-blue),var(--brand-cyan))}
+
+.sectionlabel{font-family:'Archivo';font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 2px 2px}
+
+/* ---------- Bids view ---------- */
+.view{padding:0}
+.pg-grid{display:grid;gap:18px;padding:30px 32px 64px;max-width:1320px;margin:0 auto}
+.pg-row{display:grid;gap:18px}
+.pg-row.cols-2{grid-template-columns:1fr 1fr}
+@media(max-width:1080px){.pg-row.cols-2{grid-template-columns:1fr}}
+
+.kpi--gold{background:linear-gradient(135deg,rgba(208,149,39,.08),rgba(229,197,99,.04));border:1px solid rgba(208,149,39,.12)}
+.kpi--gold .kpi__val{color:#D09527}
+.kpi--cyan{background:linear-gradient(135deg,rgba(29,180,232,.08),rgba(100,213,255,.04));border:1px solid rgba(29,180,232,.12)}
+.kpi--cyan .kpi__val{color:var(--brand-cyan)}
+.kpi--warn{background:linear-gradient(135deg,rgba(224,138,30,.08),rgba(255,180,90,.04));border:1px solid rgba(224,138,30,.12)}
+.kpi--warn .kpi__val{color:var(--warn)}
+
+.card__badge{font-size:12px;font-weight:600;color:var(--muted)}
+
+.tbl-wrap{max-height:450px;overflow-y:auto}
+.btn--sm{padding:6px 10px;font-size:12px}
+
+/* ---------- Login Screen ---------- */
+.login-screen{display:grid;place-items:center;height:100vh;background:linear-gradient(135deg,var(--navy-deep),var(--navy-deep-2));padding:20px}
+.login-box{background:var(--card);border-radius:var(--r-lg);padding:40px;max-width:380px;width:100%;box-shadow:var(--sh-3)}
+
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo img{height:50px;width:auto;display:block;margin:0 auto}
+
+.login-screen h1{font-family:'Archivo';font-weight:800;font-size:24px;color:var(--ink);text-align:center;margin-bottom:6px}
+.login-sub{color:var(--muted);text-align:center;font-size:14px;margin-bottom:24px}
+
+.login-form{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.login-form label{display:flex;flex-direction:column;gap:8px}
+.login-form label>div{font-size:13px;color:var(--ink);font-weight:600}
+.login-form input{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:0;transition:.15s}
+.login-form input:focus{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(21,131,199,.1)}
+.login-form .err{color:var(--bad);font-size:13px;font-weight:600;padding:8px 12px;background:var(--bad-bg);border-radius:8px}
+
+.login-divider{text-align:center;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin:20px 0 16px;position:relative}
+.login-divider::before,.login-divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:var(--line)}
+.login-divider::before{left:0}
+.login-divider::after{right:0}
+
+.login-demo{display:grid;grid-template-columns:1fr;gap:8px}
+.demo-user{padding:12px;border:1px solid var(--line);border-radius:10px;background:transparent;text-align:left;cursor:pointer;transition:.15s}
+.demo-user:hover{border-color:var(--brand-blue);background:rgba(21,131,199,.04)}
+.demo-user>div{font-size:13.5px;font-weight:600;color:var(--ink)}
+.demo-user>span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ---------- User Pill (sidebar footer) ---------- */
+.user-pill{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:10px 12px;border-radius:12px;position:relative}
+.user-pill__avatar{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--brand-cyan),var(--brand-blue));display:grid;place-items:center;color:#fff;font-family:'Archivo';font-weight:700;font-size:12px;flex:none}
+.user-pill__name{font-size:12.5px;color:#EAF1F7;font-weight:600;line-height:1.2}
+.user-pill__role{font-size:11px;color:#7E8EA0;line-height:1.2}
+.user-pill__logout{background:transparent;border:0;color:#A9B8C6;cursor:pointer;padding:4px;display:grid;place-items:center;transition:.15s}
+.user-pill__logout:hover{color:#EAF1F7}
+.user-pill__logout svg{width:16px;height:16px}
+
+.nav__item.is-disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* ---------- Modal ---------- */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:100;padding:20px}
+.modal{background:var(--card);border-radius:var(--r-lg);max-width:420px;width:100%;box-shadow:var(--sh-3);max-height:80vh;overflow-y:auto}
+.modal__head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px;border-bottom:1px solid var(--line)}
+.modal__head h2{font-family:'Archivo';font-weight:700;font-size:18px;color:var(--ink)}
+.modal__close{background:transparent;border:0;width:36px;height:36px;border-radius:9px;display:grid;place-items:center;color:var(--muted);cursor:pointer;transition:.15s;transform:rotate(180deg)}
+.modal__close:hover{background:var(--paper);color:var(--ink-2)}
+.modal__body{padding:20px}
+
+.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.form-group label{font-size:13px;color:var(--ink);font-weight:600}
+.form-group input,.form-group select{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:0;transition:.15s;background:transparent}
+.form-group input:focus,.form-group select:focus{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(21,131,199,.1)}
+.form-group select{color:var(--ink);background:var(--card)}
+
+.msg{padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;background:var(--ok-bg);color:var(--ok);text-align:center}
+
+/* ---------- Change Order workflow ---------- */
+.modal--wide{max-width:580px}
+.co-actionbar{display:flex;gap:8px;flex-wrap:wrap}
+.co-amt{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+textarea.co-input{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:0;transition:.15s;background:transparent;resize:vertical;min-height:78px;width:100%;box-sizing:border-box}
+textarea.co-input:focus{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(21,131,199,.1)}
+/* client approval portal */
+.portal__letterhead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;background:linear-gradient(120deg,var(--navy-deep),var(--navy));color:#fff;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.portal__letterhead img{height:34px;width:auto}
+.portal__tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-cyan)}
+.portal__body{padding:22px}
+.portal__title{font-family:'Archivo';font-weight:800;font-size:19px;color:var(--ink);margin-bottom:4px}
+.portal__sub{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.portal__impact{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.impact-box{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--card-tint)}
+.impact-box .l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.impact-box .v{font-family:'Archivo Expanded','Archivo';font-weight:800;font-size:22px;color:var(--ink);margin-top:4px;font-variant-numeric:tabular-nums}
+.reasonbox{border:1px solid var(--line);border-left:3px solid var(--brand-blue);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--ink-2);line-height:1.5;background:#fff;margin-bottom:18px}
+/* lifecycle timeline */
+.co-tl{display:flex;flex-direction:column;gap:0;margin:6px 0 4px}
+.co-tl__step{display:grid;grid-template-columns:28px 1fr;gap:12px;position:relative;padding-bottom:18px}
+.co-tl__step:last-child{padding-bottom:0}
+.co-tl__step::before{content:"";position:absolute;left:13px;top:24px;bottom:-2px;width:2px;background:var(--line)}
+.co-tl__step:last-child::before{display:none}
+.co-tl__dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--line);color:var(--muted);z-index:1}
+.co-tl__dot svg{width:14px;height:14px}
+.co-tl__step.done .co-tl__dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.co-tl__step.done::before{background:var(--ok)}
+.co-tl__step.active .co-tl__dot{background:var(--warn);border-color:var(--warn);color:#fff;box-shadow:0 0 0 4px var(--warn-bg)}
+.co-tl__step.bad .co-tl__dot{background:var(--bad);border-color:var(--bad);color:#fff}
+.co-tl__t{font-size:13.5px;font-weight:700;color:var(--ink)}
+.co-tl__d{font-size:12px;color:var(--muted);margin-top:2px}
+/* sync impact box */
+.syncbox{border:1px solid var(--ok);background:var(--ok-bg);border-radius:12px;padding:14px 16px;margin-top:8px}
+.syncbox__h{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:var(--ok);margin-bottom:10px}
+.syncbox__h svg{width:16px;height:16px}
+.syncrow{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;padding:5px 0;border-top:1px dashed rgba(30,158,106,.3)}
+.syncrow:first-of-type{border-top:0}
+.syncrow .a{color:var(--ink-2);font-weight:600}
+.syncrow .b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.distchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.distchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--navy);background:#EAF1F7;border:1px solid var(--line);padding:5px 10px;border-radius:20px}
+.distchip svg{width:13px;height:13px;color:var(--ok)}
+/* toast */
+.co-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:200;display:flex;align-items:center;gap:12px;background:var(--navy-deep);color:#fff;padding:14px 20px;border-radius:12px;box-shadow:var(--sh-3);max-width:540px;animation:toastIn .25s ease}
+.co-toast svg{width:18px;height:18px;color:var(--brand-cyan);flex:none}
+.co-toast b{color:#fff}
+.co-toast .sub{color:#AEBFD0;font-size:12.5px}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.msg:has-text('Error'){background:var(--bad-bg);color:var(--bad)}
+
+.invites-list{display:flex;flex-direction:column;gap:10px}
+.invite-row{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+
+/* Gantt Chart */
+.gantt-container{padding:30px 32px}
+.gantt-head h2{margin:0;font-size:18px;font-weight:700}
+.gantt-wrapper{display:flex;margin-top:24px;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:white}
+.gantt-sidebar{width:280px;border-right:1px solid var(--border);background:var(--bg);overflow-y:auto;max-height:500px}
+.gantt-chart{flex:1;overflow-x:auto;overflow-y:hidden}
+.gantt-header-row{display:flex;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.gantt-row{display:flex}
+.gantt-name-col{width:280px;padding:12px 16px;min-height:48px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border)}
+.gantt-chart-col{flex:1;min-width:800px;padding:8px 16px;border-bottom:1px solid var(--border)}
+
+/* fade-in */
+@media (prefers-reduced-motion:no-preference){
+  .page>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  .page>*:nth-child(2){animation-delay:.04s}
+  .page>*:nth-child(3){animation-delay:.08s}
+  .page>*:nth-child(4){animation-delay:.12s}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+}
+
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script>
+/* Dun Rite Construction — Empty project data (Firebase will populate) */
+window.DR = (function(){
+  const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+  const usdK = n => {
+    const a=Math.abs(n);
+    if(a>=1e6) return (n<0?'-$':'$')+(a/1e6).toFixed(2)+'M';
+    if(a>=1e3) return (n<0?'-$':'$')+(a/1e3).toFixed(0)+'K';
+    return (n<0?'-$':'$')+a;
+  };
+
+  const project = {
+    name:"Longleaf Amenity",
+    lot:"San Antonio, TX",
+    loc:"San Antonio, TX",
+    workbook:"BP-2026-014",
+    months:4,
+    start:"Aug 15, 2026",
+    target:"Dec 15, 2026",
+    pct:42
+  };
+
+  const budget = {
+    original:1350000, nocis:0, current:1350000, committed:570574, variance:0
+  };
+  budget.variancePct = 0;
+  budget.remaining = budget.current - budget.committed;
+
+  const kpis = [
+    {key:'gmp',       label:'GMP Contract',      val:usdK(1350000), sub:'Baseline budget',     icon:'doc',    tone:'navy'},
+    {key:'committed', label:'Committed to Date',  val:usdK(570574),  sub:'42% bought out',      icon:'check',  tone:'green'},
+    {key:'open',      label:'Open Buyout',        val:usdK(779426),  sub:'4 trades pending',    icon:'wallet', tone:'cyan'},
+    {key:'dur',       label:'Duration',           val:'4 mo',        sub:'Aug 15 – Dec 15 ’26', icon:'cal',  tone:'amber'},
+  ];
+
+  const milestones = [
+    {n:1, t:'Sitework & Foundation',                 sched:'Aug 17 – Sep 14', actual:'—', status:'upcoming'},
+    {n:2, t:'Structure — Concrete, Masonry & Steel', sched:'Sep 7 – Oct 19',  actual:'—', status:'upcoming'},
+    {n:3, t:'Pool Construction',                     sched:'Aug 24 – Dec 7',  actual:'—', status:'upcoming'},
+    {n:4, t:'Framing & Dry-In',                      sched:'Oct 5 – Nov 2',   actual:'—', status:'upcoming'},
+    {n:5, t:'MEP Rough-In',                          sched:'Oct 19 – Nov 23', actual:'—', status:'upcoming'},
+    {n:6, t:'Interior Finishes',                     sched:'Nov 9 – Dec 14',  actual:'—', status:'upcoming'},
+    {n:7, t:'Substantial Completion',                sched:'Dec 15, 2026',  actual:'—', status:'upcoming'},
+  ];
+  const gantt = [];
+  const ganttMonths = ['Aug','Sep','Oct','Nov','Dec'];
+  const todayPos = 0;
+
+  const divisions = [
+    {code:'02-000', name:'Site Work',                  budget:185000, committed:34215},
+    {code:'03-000', name:'Concrete',                   budget:30000,  committed:0},
+    {code:'04-000', name:'Masonry',                    budget:30500,  committed:0},
+    {code:'05-000', name:'Metals',                     budget:20000,  committed:0},
+    {code:'06-000', name:'Wood & Plastics',            budget:58438,  committed:0},
+    {code:'07-000', name:'Thermal & Moisture',         budget:32436,  committed:6747},
+    {code:'08-000', name:'Doors & Windows',            budget:21500,  committed:0},
+    {code:'09-000', name:'Finishes',                   budget:64440,  committed:35065},
+    {code:'10-000', name:'Specialties',                budget:8750,   committed:0},
+    {code:'13-000', name:'Special Construction',       budget:492939, committed:434630},
+    {code:'15-000', name:'Mechanical',                 budget:40000,  committed:15440},
+    {code:'16-000', name:'Electrical',                 budget:63493,  committed:44477},
+    {code:'90-000', name:'General Conditions & Fees',  budget:302504, committed:0},
+  ];
+  const subDetail = {
+    '02-000':[
+      {code:'02-220', name:'Excavate & Backfill', budget:12500, committed:0},
+      {code:'02-350', name:'Piles / Foundation',  budget:43000, committed:0},
+      {code:'02-900', name:'Pavers',              budget:30000, committed:0},
+      {code:'02-900', name:'Landscaping',         budget:63000, committed:0},
+      {code:'02-900', name:'Fencing',             budget:36500, committed:34215},
+    ],
+    '09-000':[
+      {code:'09-220', name:'Stucco / Plaster',       budget:15690, committed:12555},
+      {code:'09-250', name:'Drywall & Insulation',   budget:6500,  committed:5510},
+      {code:'09-310', name:'Floor & Wall Tile',      budget:21250, committed:17000},
+      {code:'09-370', name:'Countertops',            budget:8500,  committed:0},
+      {code:'09-900', name:'Painting Int / Ext',     budget:12500, committed:0},
+    ],
+    '13-000':[
+      {code:'13-155', name:'Swimming Pool', budget:477939, committed:434630},
+      {code:'13-200', name:'Mail Boxes',    budget:15000,  committed:0},
+    ],
+    '16-000':[
+      {code:'16-100', name:'Electrical Sub',   budget:52993, committed:44477},
+      {code:'16-105', name:'Temporary Power',  budget:10500, committed:0},
+    ],
+  };
+  const composition = [
+    {k:'Committed (awarded)', v:570574, c:'#1DB4E8'},
+    {k:'Open buyout',         v:541921, c:'#142130'},
+    {k:'Fees & insurance',    v:237505, c:'#D09527'},
+  ];
+  const rfis = [
+    {id:'RFI-001', subj:'Pool shell rebar spacing at deep end', disc:'Structural',    to:'American Pools', opened:'Jun 8',  due:'Jun 18', pr:'high', status:'open'},
+    {id:'RFI-002', subj:'Electrical service size confirmation', disc:'Electrical',     to:'EMT Electric',   opened:'Jun 9',  due:'Jun 19', pr:'med',  status:'open'},
+    {id:'RFI-003', subj:'Stucco control-joint layout',          disc:'Architectural',  to:'Gontry',         opened:'Jun 11', due:'Jun 22', pr:'low',  status:'open'},
+    {id:'RFI-004', subj:'Foundation bearing elevation',         disc:'Civil',          to:'DunRite',        opened:'Jun 5',  due:'Jun 12', pr:'med',  status:'answered'},
+    {id:'RFI-005', subj:'Paver pattern at amenity deck',        disc:'Architectural',  to:'Longleaf Dev.',  opened:'Jun 2',  due:'Jun 9',  pr:'low',  status:'closed'},
+  ];
+  const submittals = [
+    {id:'SUB-001', subj:'Pool equipment cut sheets',       spec:'13 155', ball:'A/E',     received:'Jun 7',  rev:0, status:'review'},
+    {id:'SUB-002', subj:'Switchgear & panel schedule',     spec:'16 100', ball:'A/E',     received:'Jun 8',  rev:0, status:'review'},
+    {id:'SUB-003', subj:'Floor & wall tile samples',       spec:'09 310', ball:'A/E',     received:'Jun 9',  rev:0, status:'review'},
+    {id:'SUB-004', subj:'Exterior doors & windows',        spec:'08 610', ball:'A/E',     received:'Jun 10', rev:1, status:'review'},
+    {id:'SUB-005', subj:'Spray-foam insulation data',      spec:'07 200', ball:'DunRite', received:'Jun 4',  rev:0, status:'approved'},
+    {id:'SUB-006', subj:'Stucco mix design',               spec:'09 220', ball:'DunRite', received:'Jun 3',  rev:0, status:'approved'},
+  ];
+  const delays = [];
+  const purchasing = [
+    {po:'PO-1006', vendor:'American Pools', div:'13-155', desc:'Swimming pool construction', amt:434630, status:'issued', issued:'Jun 2'},
+    {po:'PO-1005', vendor:'EMT Electric',   div:'16-100', desc:'Electrical rough & finish',  amt:44477,  status:'issued', issued:'Jun 4'},
+    {po:'PO-1014', vendor:'Keeler Fence',   div:'02-900', desc:'Site fencing',               amt:34215,  status:'issued', issued:'Jun 6'},
+    {po:'PO-1002', vendor:'Kevin Barnes',   div:'09-310', desc:'Flooring & tile',            amt:17000,  status:'issued', issued:'Jun 5'},
+    {po:'PO-1003', vendor:'Brad Ball',      div:'15-100', desc:'Plumbing + sewer connect',   amt:15440,  status:'issued', issued:'Jun 5'},
+    {po:'PO-1001', vendor:'Gontry',         div:'09-220', desc:'Lath & plaster / stucco',    amt:12555,  status:'issued', issued:'Jun 3'},
+    {po:'PO-1009', vendor:'Chris Hensley',  div:'07-200', desc:'Spray foam insulation',      amt:6747,   status:'issued', issued:'Jun 7'},
+    {po:'PO-1004', vendor:'Robert Greene',  div:'09-250', desc:'Drywall & batt insulation',  amt:5510,   status:'issued', issued:'Jun 6'},
+  ];
+  const activity = [
+    {icon:'check', t:'American Pools awarded',        d:'Pool construction · $434,630',                  when:'2d', tone:'ok'},
+    {icon:'check', t:'EMT Electric awarded',          d:'Electrical · $44,477',                          when:'4d', tone:'ok'},
+    {icon:'check', t:'Keeler Fence awarded',          d:'Site fencing · $34,215',                        when:'5d', tone:'ok'},
+    {icon:'inbox', t:'Awaiting 4 subcontractor bids', d:'Landscape, lumber, MackCore, Scotty Doo',          when:'1w', tone:'amber'},
+    {icon:'doc',   t:'Bid packet BP-2026-014 issued', d:'13 trades solicited',                              when:'2w', tone:'ok'},
+  ];
+
+  return {usd, usdK, project, budget, kpis, milestones, gantt, ganttMonths, todayPos,
+          divisions, subDetail, composition, rfis, submittals, delays, purchasing, activity};
+})();
+
+/* ============================================================
+   Change Order workflow + cross-department sync engine
+   Admin creates → sent to client → client approves/rejects →
+   copies distributed to both parties → budget, schedule &
+   dashboard recompute so every department stays in sync.
+   ============================================================ */
+(function(){
+  const D = window.DR;
+  const ADMIN_ORG  = 'DunRite Construction Group';
+  const CLIENT_ORG = D.project.client || 'Longleaf Development';
+  D.parties = {
+    admin:  { org:ADMIN_ORG,  email:'mike.rcccon@yahoo.com', name:'Michael Chandler' },
+    client: { org:CLIENT_ORG, email:'owner@longleafdev.com', name:'Longleaf Development' }
+  };
+
+  // immutable baseline + division snapshot (so re-sync is idempotent)
+  D.budget.original = 1350000;
+  const divBase = {}; D.divisions.forEach(d => divBase[d.code] = d.budget);
+  D.divBaseline = Object.assign({}, divBase);
+  const baseMilestone = D.milestones[D.milestones.length-1].sched; // 'Dec 15, 2026'
+  const baseActivity  = D.activity.slice();
+
+  // seed: one already-executed CO (visible sync on load) + one out for signature
+  D.changeOrders = [
+    {id:'CO-001', title:'Upgraded pool-deck pavers', div:'02-900', costImpact:18500, scheduleDays:5,
+     reason:'Owner-selected premium travertine in lieu of standard concrete pavers at the amenity deck.',
+     status:'executed', createdBy:'Michael Chandler', createdAt:'2026-06-10', sentAt:'2026-06-10',
+     decidedAt:'2026-06-12', decidedBy:CLIENT_ORG, clientNote:'Approved — proceed with travertine.',
+     executedAt:'2026-06-12', distributed:[ADMIN_ORG, CLIENT_ORG]},
+    {id:'CO-002', title:'Add EV charging rough-in (2 stalls)', div:'16-100', costImpact:9400, scheduleDays:3,
+     reason:'Owner request to rough-in conduit & panel capacity for two future EV charging stalls.',
+     status:'sent', createdBy:'Michael Chandler', createdAt:'2026-06-15', sentAt:'2026-06-15',
+     decidedAt:null, decidedBy:null, clientNote:'', executedAt:null, distributed:[]},
+  ];
+
+  // pub/sub so the mounted view re-renders the moment data syncs
+  const subs = new Set();
+  D.bus = { sub:f=>{subs.add(f); return ()=>subs.delete(f);},
+            emit:()=>subs.forEach(f=>{ try{f();}catch(e){} }) };
+
+  const fmtDate = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  D.find = id => D.changeOrders.find(o=>o.id===id);
+  D.executedCOs    = () => D.changeOrders.filter(o=>o.status==='executed');
+  D.coTotal        = () => D.executedCOs().reduce((s,o)=>s+o.costImpact,0);
+  D.coDays         = () => D.executedCOs().reduce((s,o)=>s+(o.scheduleDays||0),0);
+  D.pendingCOs     = () => D.changeOrders.filter(o=>o.status==='sent').length;
+  D.revisedCompletion = () => {
+    const base = new Date('2026-12-15T00:00:00');
+    base.setDate(base.getDate() + D.coDays());
+    return fmtDate(base);
+  };
+
+  // Recompute every dependent department from the executed COs
+  D.recompute = function(){
+    const coTotal = D.coTotal();
+    // Budget department
+    D.budget.nocis   = coTotal;
+    D.budget.current = D.budget.original + coTotal;
+    D.budget.remaining = D.budget.current - D.budget.committed;
+    // Division cost codes — reset to baseline then re-apply executed COs
+    D.divisions.forEach(d => d.budget = divBase[d.code]);
+    D.executedCOs().forEach(o=>{
+      const code = (o.div||'').slice(0,2)+'-000';
+      const div = D.divisions.find(x=>x.code===code);
+      if(div) div.budget += o.costImpact;
+    });
+    // Schedule department — shift substantial completion
+    const last = D.milestones[D.milestones.length-1];
+    last.sched  = D.revisedCompletion();
+    last.actual = D.coDays()>0 ? ('+'+D.coDays()+'d') : '—';
+    // Dashboard activity feed
+    const coActs = D.executedCOs().map(o=>({
+      icon:'edit', tone:'ok',
+      t:o.id+' executed · synced',
+      d:o.title+' · +'+D.usd(o.costImpact),
+      when: o.executedAt ? o.executedAt.slice(5) : 'now'
+    }));
+    D.activity = coActs.concat(baseActivity);
+    D.bus.emit();
+  };
+
+  // Lifecycle
+  D.coCreate = function(data){
+    const n = D.changeOrders.length + 1;
+    const co = {id:'CO-'+String(n).padStart(3,'0'), status:'draft',
+      createdBy:D.parties.admin.name, createdAt:fmtDate(new Date()),
+      sentAt:null, decidedAt:null, decidedBy:null, clientNote:'',
+      executedAt:null, scheduleDays:0, distributed:[], ...data};
+    D.changeOrders.unshift(co);
+    D.bus.emit(); return co;
+  };
+  D.coSend = function(id){
+    const o=D.find(id); if(!o) return;
+    o.status='sent'; o.sentAt=fmtDate(new Date());
+    D.bus.emit();
+  };
+  // Client decision returns the CO; on approval it auto-distributes & syncs
+  D.coDecide = function(id, approved, note){
+    const o=D.find(id); if(!o) return;
+    o.decidedAt=fmtDate(new Date()); o.decidedBy=D.parties.client.org; o.clientNote=note||'';
+    if(approved){
+      o.status='executed'; o.executedAt=fmtDate(new Date());
+      o.distributed=[D.parties.admin.org, D.parties.client.org];
+      D.recompute();              // <-- propagate to every department
+    } else {
+      o.status='rejected';
+      o.distributed=[D.parties.admin.org, D.parties.client.org];
+      D.bus.emit();
+    }
+  };
+
+  D.recompute(); // initial sync from seeded executed CO
+})();
+
+/* Longleaf Amenity Bids — DunRite Construction Group */
+window.PROJECT = (function(){
+  const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+  const bids = [
+    {id:1, vendor:'Gontry',              trade:'Lathe / Plaster',                    status:'Done', amt:12555.00},
+    {id:2, vendor:'Keving Barnes',       trade:'Flooring',                           status:'Done', amt:17000.00},
+    {id:3, vendor:'Brad Ball',           trade:'H20 Plumbing',                       status:'Done', amt:14720.00},
+    {id:'3.a', vendor:'Brad Ball',       trade:'H20 Sewer Connect up to 50\'',       status:'Done', amt:720.00},
+    {id:4, vendor:'Robert Greene Drywa', trade:'Drywall',                            status:'Done', amt:5510.00},
+    {id:5, vendor:'EMT Electric',        trade:'Electric',                           status:'Done', amt:44476.73},
+    {id:6, vendor:'American Pools',      trade:'Pool Construction',                  status:'Done', amt:434630.00},
+    {id:9, vendor:'Chris Hensley',       trade:'Insulation Core Foam Drum Set',      status:'Done', amt:6747.00},
+    {id:11, vendor:'Scotty Doo',         trade:'Trade TBD',                          status:'Not Returned', amt:0},
+    {id:12, vendor:'Justin Mack',        trade:'MackCore Services',                  status:'Not Returned', amt:0},
+    {id:13, vendor:'Paul',               trade:'Landscape',                          status:'Not Returned', amt:91495.00},
+    {id:14, vendor:'Keeler Fence',       trade:'Fencing',                            status:'Done', amt:34214.99},
+    {id:15, vendor:'Dwayne Hardin',      trade:'San Antonio Lumber Door Window',     status:'Not Returned', amt:0},
+  ];
+  
+  const total = bids.reduce((a,b)=>a+b.amt,0);
+  const returned = bids.filter(b=>b.status==='Done').length;
+  const notReturned = bids.filter(b=>b.status==='Not Returned').length;
+  
+  return {
+    name:'Longleaf Amenity',
+    location:'San Antonio, TX',
+    client:'Longleaf Development',
+    total, returned, notReturned, bids, usd
+  };
+})();
+
+/* Firebase + SSO Auth */
+// Firebase config (replace with your actual config)
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyDunRiteDemo',
+  authDomain: 'dunrite-demo.firebaseapp.com',
+  projectId: 'dunrite-demo',
+  storageBucket: 'dunrite-demo.appspot.com',
+  messagingSenderId: '123456789',
+  appId: '1:123456789:web:abc123def456'
+};
+
+window.AUTH = (function(){
+  const USERS = {
+    'pm@dunrite.com': {name:'Sarah Johnson', role:'pm', title:'Project Manager'},
+    'super@dunrite.com': {name:'Mike Torres', role:'super', title:'Superintendent'},
+    'finance@dunrite.com': {name:'Lisa Chen', role:'finance', title:'Finance Director'},
+    'owner@dunrite.com': {name:'David Wilson', role:'owner', title:'Principal'},
+    'admin@dunrite.com': {name:'Admin User', role:'admin', title:'Administrator'},
+    'roryulloa@gmail.com': {name:'Rory Ulloa', role:'admin', title:'Administrator'},
+    'mike.rcccon@yahoo.com': {name:'Michael Chandler', role:'admin', title:'Administrator'},
+  };
+
+  const PERMS = {
+    admin: ['dashboard','schedule','budget','changeorders','documents','daily','issues','safety','invoices','equipment','forecasting','risks','rfi','submittals','bids'],
+    pm: ['dashboard','schedule','budget','changeorders','documents','daily','issues','safety','invoices','equipment','forecasting','risks','rfi','submittals','bids'],
+    super: ['dashboard','schedule','daily','issues','safety','equipment','rfi','submittals'],
+    finance: ['dashboard','budget','changeorders','invoices','forecasting','bids'],
+    owner: ['dashboard','schedule','budget','changeorders','risks'],
+  };
+
+  let currentUser = JSON.parse(localStorage.getItem('dr_user')) || null;
+  let auditLog = JSON.parse(localStorage.getItem('dr_audit')) || [];
+  let invites = JSON.parse(localStorage.getItem('dr_invites')) || [];
+
+  const log = (action, detail, view) => {
+    const entry = {
+      ts: new Date().toISOString(),
+      user: currentUser?.email,
+      action,
+      detail,
+      view
+    };
+    auditLog.push(entry);
+    if(auditLog.length > 500) auditLog = auditLog.slice(-500);
+    localStorage.setItem('dr_audit', JSON.stringify(auditLog));
+  };
+
+  const login = (email) => {
+    const u = USERS[email];
+    if(!u) return {ok:false, err:'User not found'};
+    currentUser = {email, ...u};
+    localStorage.setItem('dr_user', JSON.stringify(currentUser));
+    log('LOGIN', `Logged in as ${u.role}`, 'auth');
+    return {ok:true, user:currentUser};
+  };
+
+  const logout = () => {
+    if(currentUser) log('LOGOUT', '', 'auth');
+    currentUser = null;
+    localStorage.removeItem('dr_user');
+    auditLog = [];
+    localStorage.removeItem('dr_audit');
+  };
+
+  const canView = (viewId) => {
+    if(!currentUser) return false;
+    const perms = PERMS[currentUser.role] || [];
+    return perms.includes(viewId);
+  };
+
+  const isAdmin = () => currentUser?.role === 'admin';
+
+  const sendInvite = (email, role) => {
+    if(!isAdmin()) return {ok:false, err:'Only admins can invite'};
+    if(!['pm','super','finance','owner'].includes(role)) return {ok:false, err:'Invalid role'};
+    
+    const inv = {
+      id: Math.random().toString(36).slice(2,11),
+      email,
+      role,
+      sentBy: currentUser.email,
+      sentAt: new Date().toISOString(),
+      status: 'pending'
+    };
+    invites.push(inv);
+    localStorage.setItem('dr_invites', JSON.stringify(invites));
+    log('INVITE_SENT', `Invited ${email} as ${role}`, 'admin');
+    return {ok:true, invite:inv};
+  };
+
+  const acceptInvite = (inviteId, email) => {
+    const inv = invites.find(i=>i.id===inviteId);
+    if(!inv) return {ok:false, err:'Invite not found'};
+    if(inv.email !== email) return {ok:false, err:'Email mismatch'};
+    if(inv.status !== 'pending') return {ok:false, err:'Invite already used'};
+    
+    const roleMap = {pm:'Project Manager',super:'Superintendent',finance:'Finance Director',owner:'Principal'};
+    USERS[email] = {name:email.split('@')[0], role:inv.role, title:roleMap[inv.role]};
+    inv.status = 'accepted';
+    invites = invites.map(i=>i.id===inviteId?inv:i);
+    localStorage.setItem('dr_invites', JSON.stringify(invites));
+    localStorage.setItem('dr_users', JSON.stringify(USERS));
+    log('INVITE_ACCEPTED', `${email} accepted invite`, 'admin');
+    return {ok:true, user:USERS[email]};
+  };
+
+  const getInvites = () => isAdmin() ? invites : [];
+  const getUser = () => currentUser;
+  const getAudit = () => auditLog;
+
+  return {login, logout, canView, isAdmin, sendInvite, acceptInvite, getInvites, getUser, getAudit, log, USERS};
+})();
+
+  </script>
+
+  <script type="text/babel">
+/* Line icons — stroke = currentColor */
+const _I = (p) => React.createElement('svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',
+  strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round'}, p.map((d,i)=>
+    typeof d==='string'?React.createElement('path',{key:i,d}):React.createElement(d.tag,{key:i,...d.a})));
+
+const Icon = {
+  dashboard: ()=>_I(['M4 13h7V4H4zM13 20h7v-9h-7zM13 4v5h7V4zM4 20h7v-5H4z']),
+  building:  ()=>_I(['M3 21h18','M5 21V5a1 1 0 011-1h7a1 1 0 011 1v16','M14 9h4a1 1 0 011 1v11',{tag:'path',a:{d:'M8 8h2M8 12h2M8 16h2'}}]),
+  cart:      ()=>_I([{tag:'circle',a:{cx:9,cy:20,r:1.4}},{tag:'circle',a:{cx:18,cy:20,r:1.4}},'M2 3h2.2l2.3 12.4a1.6 1.6 0 001.6 1.3h8.5a1.6 1.6 0 001.6-1.2L21 7H5.3']),
+  gavel:     ()=>_I(['M14 13l-7.5 7.5a2.1 2.1 0 01-3-3L11 10','M10.5 9.5l4 4','M13 4l7 7','M15.5 6.5l-4 4','M14 17h7']),
+  receipt:   ()=>_I(['M5 3v18l2-1.3L9 21l2-1.3L13 21l2-1.3L17 21l2-1.3V3l-2 1.3L15 3l-2 1.3L11 3 9 4.3 7 3z','M9 8h6M9 12h6']),
+  help:      ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M9.5 9.2a2.6 2.6 0 015 .8c0 1.7-2.5 2.2-2.5 4',{tag:'path',a:{d:'M12 17.5h.01'}}]),
+  inbox:     ()=>_I(['M3 12h5l2 3h4l2-3h5','M5.5 5h13l3 7v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z']),
+  clock:     ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M12 7.5V12l3 2']),
+  truck:     ()=>_I(['M3 6h11v9H3z','M14 9h4l3 3v3h-7','M7 18.5a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2M18 18.5a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2']),
+  doc:       ()=>_I(['M7 3h7l5 5v13a0 0 0 010 0H7a1 1 0 01-1-1V4a1 1 0 011-1z','M14 3v5h5','M9 13h6M9 17h6']),
+  edit:      ()=>_I(['M4 20h4L19 9a2 2 0 00-3-3L5 17z','M14 6l4 4']),
+  wallet:    ()=>_I(['M3 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z','M16 11h3v4h-3a2 2 0 010-4z','M3 8h13']),
+  check:     ()=>_I([{tag:'circle',a:{cx:12,cy:12,r:9}},'M8.5 12.2l2.3 2.3 4.7-4.8']),
+  alert:     ()=>_I(['M12 3l9.5 16.5H2.5z','M12 10v4',{tag:'path',a:{d:'M12 17.5h.01'}}]),
+  search:    ()=>_I([{tag:'circle',a:{cx:11,cy:11,r:7}},'M21 21l-4.3-4.3']),
+  bell:      ()=>_I(['M18 9a6 6 0 10-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9','M13.7 20a2 2 0 01-3.4 0']),
+  download:  ()=>_I(['M12 3v12','M7.5 11l4.5 4 4.5-4','M5 20h14']),
+  mail:      ()=>_I(['M3 6h18v12H3z','M3 7l9 6 9-6']),
+  users:     ()=>_I([{tag:'circle',a:{cx:9,cy:8,r:2.5}},{tag:'path',a:{d:'M4 19a4 4 0 0110 0'}},{tag:'circle',a:{cx:16,cy:8,r:2.5}},{tag:'path',a:{d:'M12 18a3 3 0 018 0'}}]),
+  cal:       ()=>_I(['M4 5h16v15H4z','M4 9h16','M8 3v4M16 3v4']),
+  trend:     ()=>_I(['M3 17l6-6 4 4 8-8','M15 7h6v6']),
+  pin:       ()=>_I(['M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z',{tag:'circle',a:{cx:12,cy:10,r:2.4}}]),
+  chevron:   ()=>_I(['M9 6l6 6-6 6']),
+  flag:      ()=>_I(['M5 21V4','M5 4h11l-2 4 2 4H5']),
+  layers:    ()=>_I(['M12 3l9 5-9 5-9-5z','M3 13l9 5 9-5','M3 18l9 5 9-5']),
+  logout:    ()=>_I(['M10 8V5a1 1 0 011-1h9a1 1 0 011 1v14a1 1 0 01-1 1h-9a1 1 0 01-1-1v-3','M3 12h11','M8 9l-3 3 3 3']),
+  file:      ()=>_I(['M7 3h10l3 3v13a1 1 0 01-1 1H8a1 1 0 01-1-1V4a1 1 0 011-1z','M14 3v3h3','M9 10h6M9 14h6']),
+  clipboard: ()=>_I(['M9 3h6v2H9z','M5 5h14v15H5z','M9 9h6M9 13h6M9 17h4']),
+  chart:     ()=>_I(['M3 19h18','M8 19V9M14 19v-7M20 19V7']),
+  receipt:   ()=>_I(['M5 3v18l2-1.3L9 21l2-1.3L13 21l2-1.3L17 21l2-1.3V3l-2 1.3L15 3l-2 1.3L11 3 9 4.3 7 3z','M9 8h6M9 12h6'])
+};
+window.Icon = Icon;
+
+/* Reusable UI atoms */
+const {useState} = React;
+
+// Re-render the mounted view whenever a department syncs (change orders etc.)
+function useSync(){
+  const [,force]=React.useState(0);
+  React.useEffect(()=>window.DR.bus.sub(()=>force(x=>x+1)),[]);
+}
+
+function Donut({size=132, stroke=20, segments}){
+  const r=(size-stroke)/2, C=2*Math.PI*r, total=segments.reduce((a,s)=>a+s.v,0);
+  let off=0;
+  return (
+    React.createElement('svg',{width:size,height:size,viewBox:`0 0 ${size} ${size}`,style:{transform:'rotate(-90deg)'}},
+      React.createElement('circle',{cx:size/2,cy:size/2,r,fill:'none',stroke:'#EEF2F6',strokeWidth:stroke}),
+      segments.map((s,i)=>{
+        const len=s.v/total*C, el=React.createElement('circle',{key:i,cx:size/2,cy:size/2,r,fill:'none',
+          stroke:s.c,strokeWidth:stroke,strokeDasharray:`${len} ${C-len}`,strokeDashoffset:-off,
+          strokeLinecap:'butt'});
+        off+=len; return el;
+      })
+    )
+  );
+}
+
+const toneBg = {
+  navy:{bg:'rgba(20,33,48,.08)', fg:'#142130'},
+  blue:{bg:'rgba(21,131,199,.12)', fg:'#1583C7'},
+  cyan:{bg:'rgba(29,180,232,.14)', fg:'#0F8Fc4'},
+  green:{bg:'#E6F6EE', fg:'#1E9E6A'},
+  amber:{bg:'#FCF3E2', fg:'#E08A1E'},
+  red:{bg:'#FBEAE9', fg:'#E0524B'},
+};
+
+function Kpi({label,val,sub,icon,tone,delta}){
+  const t=toneBg[tone]||toneBg.blue;
+  const I=Icon[icon]||Icon.doc;
+  return React.createElement('div',{className:'card kpi'},
+    React.createElement('div',{className:'kpi__top'},
+      React.createElement('div',{className:'kpi__ico',style:{background:t.bg,color:t.fg}}, React.createElement(I)),
+      React.createElement('div',{className:'kpi__label'},label)
+    ),
+    React.createElement('div',{className:'kpi__val tnum'},val),
+    React.createElement('div',{className:'kpi__sub'},
+      delta && React.createElement('span',{className:'delta delta--'+(delta.dir==='up'?'up':delta.dir==='down'?'down':'flat')},
+        React.createElement(delta.dir==='down'?Icon.trend:Icon.trend), delta.v),
+      React.createElement('span',null,sub)
+    )
+  );
+}
+
+function Pill({status}){
+  const map={
+    done:['ok','Complete'], complete:['ok','Complete'], approved:['ok','Approved'], closed:['idle','Closed'],
+    active:['warn','In Progress'], 'in progress':['warn','In Progress'], review:['warn','In Review'], partial:['warn','Partial'],
+    open:['bad','Open'], rejected:['bad','Rejected'], next:['idle','Upcoming'], upcoming:['idle','Upcoming'],
+    answered:['ok','Answered'], issued:['ok','Issued'], received:['ok','Received']
+  };
+  const [tone,label]=map[status]||['idle',status];
+  return React.createElement('span',{className:'pill pill--'+tone},label);
+}
+
+function PriPill({pr}){
+  const m={high:['bad','High'],med:['warn','Medium'],low:['idle','Low']};
+  const [tone,label]=m[pr]||['idle',pr];
+  return React.createElement('span',{className:'pill pill--'+tone},label);
+}
+
+Object.assign(window,{Donut,Kpi,Pill,PriPill,toneBg});
+
+/* Login screen */
+function LoginScreen(){
+  const [email, setEmail] = React.useState('pm@dunrite.com');
+  const [password, setPassword] = React.useState('');
+  const [err, setErr] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const res = await window.AUTH.login(email, password||'demo');
+    setLoading(false);
+    if(!res.ok) setErr(res.err);
+    else window.location.reload();
+  };
+
+  return React.createElement('div',{className:'login-screen'},
+    React.createElement('div',{className:'login-box'},
+      React.createElement('div',{className:'login-logo'},
+        React.createElement('img',{src:'assets/dunrite-dark.png',alt:'DunRite Construction Group',style:{height:104,width:'auto',margin:'0 auto'}})
+      ),
+      React.createElement('h1',null,'Dun Rite Construction'),
+      React.createElement('p',{className:'login-sub'},'Project Controls Portal'),
+
+      React.createElement('form',{onSubmit:handleLogin,className:'login-form'},
+        React.createElement('label',null,
+          React.createElement('div',null,'Email'),
+          React.createElement('input',{
+            type:'email',
+            placeholder:'pm@dunrite.com',
+            value:email,
+            onChange:(e)=>{setEmail(e.target.value);setErr('')},
+            disabled:loading,
+            autoFocus:true
+          })
+        ),
+        React.createElement('label',null,
+          React.createElement('div',null,'Password'),
+          React.createElement('input',{
+            type:'password',
+            placeholder:'(demo mode: any password)',
+            value:password,
+            onChange:(e)=>{setPassword(e.target.value);setErr('')},
+            disabled:loading
+          })
+        ),
+        err && React.createElement('div',{className:'err'},err),
+        React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'},disabled:loading},
+          loading ? 'Signing in...' : 'Sign In'
+        )
+      ),
+
+      React.createElement('div',{className:'login-divider'},'Demo Users'),
+      React.createElement('div',{className:'login-demo'},
+        React.createElement('button',{
+          type:'button',
+          className:'demo-user',
+          onClick:()=>{setEmail('pm@dunrite.com');setPassword('')},
+          disabled:loading
+        },
+          React.createElement('div',null,'Sarah Johnson'),
+          React.createElement('span',null,'Project Manager')
+        ),
+        React.createElement('button',{
+          type:'button',
+          className:'demo-user',
+          onClick:()=>{setEmail('super@dunrite.com');setPassword('')},
+          disabled:loading
+        },
+          React.createElement('div',null,'Mike Torres'),
+          React.createElement('span',null,'Superintendent')
+        ),
+        React.createElement('button',{
+          type:'button',
+          className:'demo-user',
+          onClick:()=>{setEmail('finance@dunrite.com');setPassword('')},
+          disabled:loading
+        },
+          React.createElement('div',null,'Lisa Chen'),
+          React.createElement('span',null,'Finance Director')
+        ),
+        React.createElement('button',{
+          type:'button',
+          className:'demo-user',
+          onClick:()=>{setEmail('owner@dunrite.com');setPassword('')},
+          disabled:loading
+        },
+          React.createElement('div',null,'David Wilson'),
+          React.createElement('span',null,'Principal')
+        ),
+        React.createElement('button',{
+          type:'button',
+          className:'demo-user',
+          onClick:()=>{setEmail('roryulloa@gmail.com');setPassword('')},
+          disabled:loading
+        },
+          React.createElement('div',null,'Rory Ulloa'),
+          React.createElement('span',null,'Administrator')
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{LoginScreen});
+
+
+/* Admin panel for user management */
+function AdminPanel({onClose}){
+  const [tab, setTab] = React.useState('users');
+  const [users, setUsers] = React.useState([]);
+  const [invites, setInvites] = React.useState([]);
+  const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [role, setRole] = React.useState('pm');
+  const [msg, setMsg] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    loadUsers();
+    loadInvites();
+  }, []);
+
+  const loadUsers = () => {
+    const users = JSON.parse(localStorage.getItem('dr_all_users')) || [];
+    setUsers(users);
+  };
+
+  const loadInvites = async () => {
+    const inv = await window.AUTH.getInvites();
+    setInvites(inv);
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    if(!email.trim() || !name.trim()) {setMsg('Fill all fields'); return;}
+    
+    setLoading(true);
+    const newUser = {
+      id: Math.random().toString(36).slice(2,11),
+      email,
+      name,
+      role,
+      title: {pm:'Project Manager',super:'Superintendent',finance:'Finance Director',owner:'Principal'}[role],
+      createdAt: new Date().toISOString(),
+      status: 'active'
+    };
+    
+    const allUsers = JSON.parse(localStorage.getItem('dr_all_users')) || [];
+    if(allUsers.find(u=>u.email===email)) {setLoading(false); setMsg('User already exists'); return;}
+    
+    allUsers.push(newUser);
+    localStorage.setItem('dr_all_users', JSON.stringify(allUsers));
+    window.AUTH.log('USER_ADDED', `Added ${name} as ${role}`, 'admin');
+    
+    setLoading(false);
+    setMsg(`✓ User ${name} added`);
+    setEmail('');
+    setName('');
+    setRole('pm');
+    loadUsers();
+    setTimeout(()=>setMsg(''), 3000);
+  };
+
+  const handleInvite = async (e) => {
+    e.preventDefault();
+    if(!email.trim()) {setMsg('Enter an email'); return;}
+    setLoading(true);
+    const res = await window.AUTH.sendInvite(email, role);
+    setLoading(false);
+    if(!res.ok) {setMsg('Error: '+res.err); return;}
+    setMsg(`✓ Invite sent to ${email}`);
+    setEmail('');
+    setRole('pm');
+    loadInvites();
+    setTimeout(()=>setMsg(''), 3000);
+  };
+
+  const handleDeleteUser = (userId) => {
+    if(!confirm('Delete this user?')) return;
+    const allUsers = JSON.parse(localStorage.getItem('dr_all_users')) || [];
+    const updated = allUsers.filter(u=>u.id!==userId);
+    localStorage.setItem('dr_all_users', JSON.stringify(updated));
+    window.AUTH.log('USER_DELETED', `Deleted user ${userId}`, 'admin');
+    loadUsers();
+  };
+
+  const roles = {pm:'Project Manager',super:'Superintendent',finance:'Finance Director',owner:'Principal'};
+
+  return React.createElement('div',{className:'modal-overlay',onClick:onClose},
+    React.createElement('div',{className:'modal',style:{maxWidth:700},onClick:(e)=>e.stopPropagation()},
+      React.createElement('div',{className:'modal__head'},
+        React.createElement('h2',null,'User Management'),
+        React.createElement('button',{className:'modal__close',onClick:onClose},'✕')
+      ),
+
+      React.createElement('div',{style:{display:'flex',gap:12,borderBottom:'1px solid var(--border)',paddingBottom:12,marginBottom:16}},
+        React.createElement('button',{onClick:()=>setTab('users'),style:{background:'none',border:'none',paddingBottom:8,borderBottom:tab==='users'?'2px solid var(--brand-blue)':'none',color:tab==='users'?'var(--ink)':'var(--muted)',cursor:'pointer',fontSize:14,fontWeight:600}},'Manage Users ('+users.length+')'),
+        React.createElement('button',{onClick:()=>setTab('invites'),style:{background:'none',border:'none',paddingBottom:8,borderBottom:tab==='invites'?'2px solid var(--brand-blue)':'none',color:tab==='invites'?'var(--ink)':'var(--muted)',cursor:'pointer',fontSize:14,fontWeight:600}},'Invite Users')
+      ),
+
+      React.createElement('div',{className:'modal__body'},
+        tab==='users' && React.createElement('div',null,
+          React.createElement('form',{onSubmit:handleAddUser},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Full Name'),
+              React.createElement('input',{type:'text',placeholder:'John Smith',value:name,onChange:(e)=>setName(e.target.value),disabled:loading})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Email Address'),
+              React.createElement('input',{type:'email',placeholder:'john@company.com',value:email,onChange:(e)=>setEmail(e.target.value),disabled:loading})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Role'),
+              React.createElement('select',{value:role,onChange:(e)=>setRole(e.target.value),disabled:loading},
+                React.createElement('option',{value:'pm'},'Project Manager'),
+                React.createElement('option',{value:'super'},'Superintendent'),
+                React.createElement('option',{value:'finance'},'Finance Director'),
+                React.createElement('option',{value:'owner'},'Principal')
+              )
+            ),
+            msg && React.createElement('div',{className:'msg'},msg),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'},disabled:loading},loading?'Adding...':'Add User')
+          ),
+          users.length > 0 && React.createElement('div',{style:{marginTop:24}},
+            React.createElement('h3',{style:{fontSize:14,fontWeight:700,marginBottom:12}},'Active Users'),
+            users.map(u=>React.createElement('div',{key:u.id,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:12,borderBottom:'1px solid var(--border)'}},
+              React.createElement('div',null,
+                React.createElement('div',{style:{fontSize:13,fontWeight:600}},u.name),
+                React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2}},u.email),
+                React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2}},roles[u.role])
+              ),
+              React.createElement('button',{onClick:()=>handleDeleteUser(u.id),style:{background:'var(--err)',color:'white',border:'none',padding:'4px 8px',borderRadius:4,cursor:'pointer',fontSize:11,fontWeight:600}},'Remove')
+            ))
+          )
+        ),
+
+        tab==='invites' && React.createElement('div',null,
+          React.createElement('form',{onSubmit:handleInvite},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Email Address'),
+              React.createElement('input',{type:'email',placeholder:'executive@company.com',value:email,onChange:(e)=>setEmail(e.target.value),disabled:loading})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Role'),
+              React.createElement('select',{value:role,onChange:(e)=>setRole(e.target.value),disabled:loading},
+                React.createElement('option',{value:'pm'},'Project Manager'),
+                React.createElement('option',{value:'super'},'Superintendent'),
+                React.createElement('option',{value:'finance'},'Finance Director'),
+                React.createElement('option',{value:'owner'},'Principal')
+              )
+            ),
+            msg && React.createElement('div',{className:'msg'},msg),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'},disabled:loading},loading?'Sending...':'Send Invite')
+          ),
+          invites.filter(i=>i.status==='pending').length > 0 && React.createElement('div',{style:{marginTop:24}},
+            React.createElement('h3',{style:{fontSize:14,fontWeight:700,marginBottom:12}},'Pending Invites'),
+            invites.filter(i=>i.status==='pending').map(i=>React.createElement('div',{key:i.id,style:{padding:12,borderBottom:'1px solid var(--border)'}},
+              React.createElement('div',{style:{fontSize:13,fontWeight:600}},i.email),
+              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2}},roles[i.role]+' · Sent '+new Date(i.sentAt).toLocaleDateString()),
+              React.createElement('code',{style:{fontSize:9,color:'var(--muted)',fontFamily:'monospace',marginTop:4,display:'block'}},i.inviteCode)
+            ))
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{AdminPanel});
+
+/* Sidebar + Topbar */
+
+const NAV = [
+  {id:'dashboard', label:'Dashboard',     icon:'dashboard'},
+  {id:'schedule',  label:'Schedule',      icon:'cal'},
+  {id:'budget',    label:'Budget',        icon:'wallet'},
+];
+const NAV_LOGS = [
+  {id:'documents', label:'Documents',     icon:'file'},
+  {id:'daily',     label:'Daily Reports', icon:'clipboard'},
+  {id:'issues',    label:'Issues',        icon:'alert'},
+  {id:'safety',    label:'Safety',        icon:'alert'},
+  {id:'changeorders', label:'Change Orders', icon:'edit'},
+  {id:'invoices',  label:'Invoices',      icon:'receipt'},
+  {id:'equipment', label:'Equipment',     icon:'layers'},
+  {id:'forecasting', label:'Cost Forecast', icon:'trend'},
+  {id:'risks',     label:'Risk Register', icon:'flag'},
+  {id:'rfi',       label:'RFI Log',       icon:'help',      badge:'3'},
+  {id:'submittals', label:'Submittals',   icon:'inbox',     badge:'4'},
+  {id:'bids',      label:'Bids Tracking', icon:'check'},
+];
+
+function Sidebar({active,go,user}){
+  const handleLogout = async () => {
+    if(confirm('Sign out?')) {
+      await window.AUTH.logout();
+      window.location.reload();
+    }
+  };
+
+  return React.createElement('aside',{className:'sidebar'},
+    React.createElement('div',{className:'sidebar__brand'},
+      React.createElement('img',{src:'assets/dunrite-white.png',alt:'DunRite Construction Group',style:{height:52,width:'auto'}})
+    ),
+    React.createElement('div',{className:'sidebar__sect'},'Project Controls'),
+    React.createElement('nav',{className:'nav'}, NAV.map(n=>React.createElement('button',{
+      key:n.id, className:'nav__item'+(active===n.id?' is-active':'')+(window.AUTH.canView(n.id)?'':' is-disabled'), 
+      onClick:()=>go(n.id),
+      disabled:!window.AUTH.canView(n.id)},
+      React.createElement(Icon[n.icon]),
+      React.createElement('span',null,n.label),
+      n.badge && React.createElement('span',{className:'nav__badge'},n.badge)
+    ))),
+    React.createElement('div',{className:'sidebar__sect'},'Logs & Tracking'),
+    React.createElement('nav',{className:'nav'}, NAV_LOGS.map(n=>React.createElement('button',{
+      key:n.id, className:'nav__item'+(active===n.id?' is-active':'')+(window.AUTH.canView(n.id)?'':' is-disabled'), 
+      onClick:()=>go(n.id),
+      disabled:!window.AUTH.canView(n.id)},
+      React.createElement(Icon[n.icon]),
+      React.createElement('span',null,n.label),
+      n.badge && React.createElement('span',{className:'nav__badge'},n.badge)
+    ))),
+    React.createElement('div',{className:'sidebar__foot'},
+      React.createElement('div',{className:'user-pill'},
+        React.createElement('div',{className:'user-pill__avatar'},user.name.split(' ').map(w=>w[0]).join('').toUpperCase()),
+        React.createElement('div',null,
+          React.createElement('div',{className:'user-pill__name'},user.name),
+          React.createElement('div',{className:'user-pill__role'},user.title)
+        ),
+        React.createElement('button',{className:'user-pill__logout',onClick:handleLogout,title:'Sign out'},
+          React.createElement(Icon.logout)
+        )
+      )
+    )
+  );
+}
+
+const TITLES = {
+  dashboard:'Executive Summary', schedule:'Construction Schedule', gantt:'Gantt Chart', budget:'Budget & Cost Control',
+  documents:'Document Management', daily:'Daily Reports', issues:'Issue Tracker', safety:'Safety Incident Log', changeorders:'Change Orders', invoices:'Invoice & Requisitions', equipment:'Equipment & Material Tracking', forecasting:'Cost Forecasting & Variance', risks:'Risk Register',
+  rfi:'RFI Log', submittals:'Submittal Log', bids:'Bids Tracking — Longleaf Amenity'
+};
+
+function Topbar({active,user}){
+  return React.createElement('header',{className:'topbar'},
+    React.createElement('div',{className:'crumb'},
+      React.createElement(Icon.building),
+      React.createElement('span',null, (window.DR&&window.DR.project&&window.DR.project.name)||"Project"),
+      React.createElement(Icon.chevron),
+      React.createElement('b',null, TITLES[active]||'Dashboard')
+    ),
+    React.createElement('div',{className:'topbar__spacer'}),
+    React.createElement('label',{className:'search'},
+      React.createElement(Icon.search),
+      React.createElement('input',{placeholder:'Search RFIs, POs, cost codes…'})
+    ),
+    React.createElement('button',{className:'icon-btn',title:'Notifications'},
+      React.createElement(Icon.bell), React.createElement('span',{className:'dot'})),
+    React.createElement('button',{className:'btn btn--ghost',style:{height:40}},
+      React.createElement(Icon.download),'Export'),
+    React.createElement('div',{className:'avatar',title:user?.title||'User'},(user?.name||'DR').split(' ').map(w=>w[0]).join('').toUpperCase())
+  );
+}
+
+Object.assign(window,{Sidebar,Topbar});
+
+/* Dashboard / Executive Summary */
+function Dashboard(){
+  useSync();
+  const D=window.DR;
+  const total=D.budget.current;
+  const committedPct = total ? Math.round(D.budget.committed/total*100) : 0;
+  const coTotal = D.coTotal();
+
+  const miniStats=[
+    {label:'Trades Awarded', val:'9', of:'of 13', tone:'green', icon:'check'},
+    {label:'Pending Bids', val:'4', of:'awaiting', tone:'amber', icon:'inbox'},
+    {label:'Approved COs', val:D.usdK(coTotal), of:(coTotal>0?'+'+(D.budget.original?Math.round(coTotal/D.budget.original*1000)/10:0)+'% contract':'none'), tone:'amber', icon:'edit'},
+    {label:'Open Buyout', val:D.usdK(D.budget.remaining), of:'vs revised', tone:'navy', icon:'doc'},
+  ];
+
+  return React.createElement('div',{className:'page'},
+    /* head */
+    React.createElement('div',{className:'page-head'},
+      React.createElement('div',null,
+        React.createElement('h1',null,'Executive Summary'),
+        React.createElement('div',{className:'sub'},
+          React.createElement('span',{className:'chip'},React.createElement(Icon.pin),D.project.name+' · '+D.project.lot),
+          React.createElement('span',{className:'chip'},React.createElement(Icon.cal),D.project.months+'-month schedule'),
+          React.createElement('span',{className:'chip'},React.createElement(Icon.flag),'Started '+D.project.start+' · Target '+D.project.target)
+        )
+      ),
+      React.createElement('div',{style:{display:'flex',gap:10}},
+        React.createElement('button',{className:'btn btn--ghost'},React.createElement(Icon.mail),'Open / Email'),
+        React.createElement('button',{className:'btn btn--primary'},React.createElement(Icon.download),'Download Workbook')
+      )
+    ),
+
+    /* KPI row */
+    React.createElement('div',{className:'grid kpis'}, D.kpis.map(k=>React.createElement(Kpi,{key:k.key,...k}))),
+
+    /* budget health + project health */
+    React.createElement('div',{className:'grid cols-2-1'},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card__h'},
+          React.createElement('h3',null,'Budget Health'),
+          React.createElement('span',{className:'meta'},'Current budget '+D.usd(D.budget.current))
+        ),
+        React.createElement('div',{className:'donut-wrap'},
+          React.createElement('div',{className:'donut'},
+            React.createElement(Donut,{size:164,stroke:24,segments:D.composition}),
+            React.createElement('div',{className:'donut__center'},
+              React.createElement('div',{className:'n tnum'},committedPct+'%'),
+              React.createElement('div',{className:'l'},'Committed')
+            )
+          ),
+          React.createElement('div',{className:'legend'},
+            D.composition.map((s,i)=>React.createElement('div',{key:i,className:'legend__row'},
+              React.createElement('span',{className:'legend__sw',style:{background:s.c}}),
+              React.createElement('span',{className:'k'},s.k),
+              React.createElement('span',{className:'v tnum'},D.usd(s.v))
+            )),
+            React.createElement('div',{style:{height:1,background:'var(--line-soft)',margin:'4px 0'}}),
+            React.createElement('div',{className:'legend__row'},
+              React.createElement('span',{style:{width:11}}),
+              React.createElement('span',{className:'k',style:{fontWeight:700,color:'var(--ink)'}},'Contingency variance'),
+              React.createElement('span',{className:'v tnum',style:{color:'var(--bad)'}},D.usdK(D.budget.variance))
+            )
+          )
+        )
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card__h'},React.createElement('h3',null,'Project Health')),
+        React.createElement('div',{style:{padding:'14px 18px 18px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          miniStats.map((m,i)=>{
+            const t=toneBg[m.tone];
+            return React.createElement('div',{key:i,style:{background:'var(--card-tint)',border:'1px solid var(--line-soft)',borderRadius:12,padding:'13px 14px'}},
+              React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:8}},
+                React.createElement('span',{style:{width:28,height:28,borderRadius:8,display:'grid',placeItems:'center',background:t.bg,color:t.fg}},React.createElement(Icon[m.icon])),
+                React.createElement('span',{style:{fontSize:12,color:'var(--muted)',fontWeight:600}},m.label)
+              ),
+              React.createElement('div',{style:{display:'flex',alignItems:'baseline',gap:6}},
+                React.createElement('span',{className:'tnum',style:{fontFamily:'Archivo',fontWeight:800,fontSize:22,color:'var(--ink)'}},m.val),
+                React.createElement('span',{style:{fontSize:12,color:'var(--faint)',fontWeight:600}},m.of)
+              )
+            );
+          })
+        )
+      )
+    ),
+
+    /* milestones + activity */
+    React.createElement('div',{className:'grid cols-2-1'},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card__h'},
+          React.createElement('h3',null,'Schedule Milestones'),
+          React.createElement('span',{className:'meta'},'9 of 13 trades awarded · '+D.project.pct+'% by value')
+        ),
+        React.createElement('div',{style:{padding:'14px 20px 0'}},
+          React.createElement('div',{className:'prog'},React.createElement('i',{style:{width:D.project.pct+'%'}}))
+        ),
+        React.createElement('div',{className:'mstones'},
+          D.milestones.map(m=>React.createElement('div',{key:m.n,className:'mrow '+m.status},
+            React.createElement('div',{className:'mnum'}, m.status==='done'?'✓':m.n),
+            React.createElement('div',null,
+              React.createElement('div',{className:'mtitle'},m.t),
+              React.createElement('div',{className:'mdates'},
+                React.createElement('span',null,'Sched ',React.createElement('b',null,m.sched)),
+                React.createElement('span',null,'Actual ',React.createElement('b',null,m.actual))
+              )
+            ),
+            React.createElement(Pill,{status:m.status})
+          ))
+        )
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card__h'},React.createElement('h3',null,'Recent Activity')),
+        React.createElement('div',{className:'alist'},
+          D.activity.map((a,i)=>{
+            const t=toneBg[a.tone==='ok'?'green':a.tone==='bad'?'red':'amber'];
+            return React.createElement('div',{key:i,className:'aitem'},
+              React.createElement('span',{className:'aico',style:{background:t.bg,color:t.fg}},React.createElement(Icon[a.icon])),
+              React.createElement('div',{style:{flex:1}},
+                React.createElement('div',{className:'t'},a.t),
+                React.createElement('div',{className:'d'},a.d)
+              ),
+              React.createElement('span',{className:'when'},a.when)
+            );
+          })
+        )
+      )
+    )
+  );
+}
+window.Dashboard=Dashboard;
+
+/* Schedule — gantt timeline */
+function Schedule(){
+  useSync();
+  const D=window.DR;
+  const SPAN=122; // Aug 15 → Dec 15, 2026 (days)
+  const pos=d=>d/SPAN*100;
+  const start=new Date(2026,7,15), today=new Date();
+  const dts=Math.max(0,Math.round((start-today)/864e5));
+  const PHASE={
+    site:     {label:'Sitework',  c:'#1DB4E8'},
+    structure:{label:'Structure', c:'#33506B'},
+    pool:     {label:'Pool',      c:'#D09527'},
+    mep:      {label:'MEP',       c:'#12A3A3'},
+    envelope: {label:'Envelope',  c:'#1583C7'},
+    finishes: {label:'Finishes',  c:'#1E9E6A'},
+    closeout: {label:'Closeout',  c:'#8A93A0'},
+  };
+  const T=[
+    {t:'Mobilization & Temp Power', code:'16-105', ph:'site',      s:0,   d:7,  aw:false},
+    {t:'Excavate & Backfill',       code:'02-220', ph:'site',      s:5,   d:10, aw:false},
+    {t:'Piles / Foundation',        code:'02-350', ph:'structure', s:13,  d:15, aw:false},
+    {t:'Structural Concrete',       code:'03-110', ph:'structure', s:26,  d:20, aw:false},
+    {t:'Pool Construction',         code:'13-155', ph:'pool',      s:14,  d:90, aw:true},
+    {t:'Concrete Masonry',          code:'04-220', ph:'structure', s:44,  d:18, aw:false},
+    {t:'Structural Steel',          code:'05-120', ph:'structure', s:50,  d:16, aw:false},
+    {t:'Rough Framing',             code:'06-110', ph:'structure', s:56,  d:28, aw:false},
+    {t:'Plumbing',                  code:'15-100', ph:'mep',       s:60,  d:40, aw:true},
+    {t:'Electrical',                code:'16-100', ph:'mep',       s:62,  d:50, aw:true},
+    {t:'HVAC',                      code:'15-500', ph:'mep',       s:64,  d:40, aw:false},
+    {t:'Shingles & Flashing',       code:'07-310', ph:'envelope',  s:84,  d:15, aw:false},
+    {t:'Doors & Windows',           code:'08-610', ph:'envelope',  s:88,  d:6,  aw:false},
+    {t:'Spray Insulation',          code:'07-200', ph:'envelope',  s:90,  d:5,  aw:true},
+    {t:'Stucco / Plaster',          code:'09-220', ph:'envelope',  s:92,  d:15, aw:true},
+    {t:'Drywall & Insulation',      code:'09-250', ph:'finishes',  s:96,  d:12, aw:true},
+    {t:'Floor & Wall Tile',         code:'09-310', ph:'finishes',  s:100, d:18, aw:true},
+    {t:'Countertops & Millwork',    code:'09-370', ph:'finishes',  s:104, d:14, aw:false},
+    {t:'Painting Int / Ext',        code:'09-900', ph:'finishes',  s:104, d:15, aw:false},
+    {t:'Bath Accessories',          code:'10-810', ph:'finishes',  s:113, d:5,  aw:false},
+    {t:'Fencing',                   code:'02-900', ph:'site',      s:96,  d:10, aw:true},
+    {t:'Pavers & Landscaping',      code:'02-900', ph:'site',      s:100, d:22, aw:false},
+    {t:'Punch & Substantial Comp.', code:'\u2014', ph:'closeout',  s:116, d:6,  aw:false},
+  ];
+  const MON=[{m:'Aug',d:17},{m:'Sep',d:30},{m:'Oct',d:31},{m:'Nov',d:30},{m:'Dec',d:14}];
+  let acc=0; const grid=[]; MON.forEach(x=>{acc+=x.d; if(acc<SPAN) grid.push(acc);});
+  const LABELW=236;
+  const colTpl=LABELW+'px 1fr';
+
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'page-head'},
+      React.createElement('div',null,
+        React.createElement('h1',null,'Construction Schedule'),
+        React.createElement('div',{className:'sub'},
+          React.createElement('span',{className:'chip'},React.createElement(Icon.cal),'Aug 15 – '+D.revisedCompletion()),
+          D.coDays()>0
+            ? React.createElement('span',{className:'chip',style:{color:'var(--warn)'}},React.createElement(Icon.edit),'+'+D.coDays()+' days from change orders')
+            : React.createElement('span',{className:'chip'},React.createElement(Icon.layers),'23 activities · 7 phases')
+        )
+      ),
+      React.createElement('div',{style:{display:'flex',gap:10}},
+        React.createElement('button',{className:'btn btn--ghost'},React.createElement(Icon.download),'Export'),
+        React.createElement('button',{className:'btn btn--primary'},React.createElement(Icon.edit),'Update Status')
+      )
+    ),
+
+    React.createElement('div',{className:'grid kpis',style:{gridTemplateColumns:'repeat(4,1fr)'}},
+      React.createElement(Kpi,{label:'Duration',val:'4 mo',sub:'Aug 15 – Dec 15 ’26',icon:'cal',tone:'navy'}),
+      React.createElement(Kpi,{label:'Activities',val:'23',sub:'7 trade phases',icon:'layers',tone:'cyan'}),
+      React.createElement(Kpi,{label:'Bought Out',val:'42%',sub:'9 of 13 trades',icon:'check',tone:'green'}),
+      React.createElement(Kpi,{label:'Days to Start',val:String(dts),sub:'mobilize Aug 15',icon:'clock',tone:'amber'})
+    ),
+
+    React.createElement('div',{className:'card tablecard'},
+      React.createElement('div',{className:'card__h'},
+        React.createElement('h3',null,'Construction Gantt'),
+        React.createElement('span',{className:'meta'},'Bars show planned start & duration · solid = bought out')
+      ),
+      React.createElement('div',{className:'sg'},
+        React.createElement('div',{className:'sg__head',style:{gridTemplateColumns:colTpl}},
+          React.createElement('div',{className:'sg__corner'},'Activity'),
+          React.createElement('div',{className:'sg__months'},
+            MON.map((x,i)=>React.createElement('div',{key:i,className:'sg__mon',style:{width:(x.d/SPAN*100)+'%'}}, x.m+' ’26'))
+          )
+        ),
+        T.map((a,i)=>{
+          const c=PHASE[a.ph].c;
+          return React.createElement('div',{key:i,className:'sg__row',style:{gridTemplateColumns:colTpl}},
+            React.createElement('div',{className:'sg__label'},
+              React.createElement('span',{className:'sg__dot',style:{background:c}}),
+              React.createElement('div',null,
+                React.createElement('div',{className:'sg__name'},a.t),
+                React.createElement('div',{className:'sg__code'},a.code+' · '+a.d+' days'+(a.aw?' · awarded':''))
+              )
+            ),
+            React.createElement('div',{className:'sg__track'},
+              grid.map((g,gi)=>React.createElement('div',{key:gi,className:'sg__grid',style:{left:pos(g)+'%'}})),
+              React.createElement('div',{
+                className:'sg__bar'+(a.aw?' is-aw':''),
+                title:a.t+' · '+a.d+' days',
+                style:{left:pos(a.s)+'%',width:pos(a.d)+'%',
+                  background:a.aw?c:undefined,
+                  borderColor:c,
+                  color:a.aw?'#fff':c}
+              }, a.d>=10?React.createElement('span',{className:'sg__barlbl'},a.d+'d'):null)
+            )
+          );
+        }),
+        React.createElement('div',{className:'sg__legend'},
+          Object.keys(PHASE).map(k=>React.createElement('span',{key:k,className:'sg__lg'},
+            React.createElement('span',{className:'sg__sw',style:{background:PHASE[k].c}}),PHASE[k].label)),
+          React.createElement('span',{className:'sg__lg'},
+            React.createElement('span',{className:'sg__sw',style:{background:'#EFF3F8',border:'1.5px dashed #9fb0c0'}}),'Pending buyout')
+        )
+      )
+    ),
+
+    React.createElement('div',{className:'card tablecard',style:{marginTop:20}},
+      React.createElement('div',{className:'card__h'},React.createElement('h3',null,'Phase Milestones')),
+      React.createElement('table',{className:'tbl'},
+        React.createElement('thead',null,React.createElement('tr',null,
+          ['#','Milestone','Scheduled','Actual / Forecast','Status'].map((h,i)=>React.createElement('th',{key:i,style:i===0?{width:50}:null},h)))),
+        React.createElement('tbody',null, D.milestones.map(m=>React.createElement('tr',{key:m.n},
+          React.createElement('td',{className:'code'},m.n),
+          React.createElement('td',{className:'strong'},m.t),
+          React.createElement('td',null,m.sched),
+          React.createElement('td',null,m.actual),
+          React.createElement('td',null,React.createElement(Pill,{status:m.status}))
+        )))
+      )
+    )
+  );
+}
+window.Schedule=Schedule;
+
+/* Gantt Chart View */
+function GanttChart(){
+  const P = window.PROJECT || {bids:[]};
+  
+  // Sample milestone data (will be replaced with Firebase data)
+  const milestones = [
+    {id:'m1', name:'Site Prep & Permits',       start:'2026-06-01', end:'2026-07-15', progress:100, status:'done'},
+    {id:'m2', name:'Foundation & Concrete',     start:'2026-07-01', end:'2026-09-30', progress:100, status:'done'},
+    {id:'m3', name:'Framing & Rough-In',        start:'2026-09-15', end:'2026-11-30', progress:100, status:'done'},
+    {id:'m4', name:'MEP Systems',               start:'2026-11-01', end:'2027-01-31', progress:85, status:'in-progress'},
+    {id:'m5', name:'Drywall & Interior Finish', start:'2027-01-15', end:'2027-04-30', progress:45, status:'in-progress'},
+    {id:'m6', name:'Exterior & Landscaping',    start:'2027-03-01', end:'2027-06-15', progress:10, status:'pending'},
+    {id:'m7', name:'Final Inspections',         start:'2027-06-01', end:'2027-07-15', progress:0, status:'pending'},
+    {id:'m8', name:'Punch List & Closeout',     start:'2027-07-01', end:'2027-08-31', progress:0, status:'pending'},
+  ];
+
+  const startDate = new Date(2026, 5, 1); // June 2026
+  const endDate = new Date(2027, 8, 30);   // Sept 2027
+  const totalDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+  const today = new Date();
+  const daysElapsed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+  const todayPercent = Math.max(0, Math.min(100, (daysElapsed / totalDays) * 100));
+
+  const getBarPercent = (start, end) => {
+    const s = new Date(start);
+    const e = new Date(end);
+    const mStart = Math.floor((s - startDate) / (1000 * 60 * 60 * 24));
+    const mEnd = Math.floor((e - startDate) / (1000 * 60 * 60 * 24));
+    const offset = (mStart / totalDays) * 100;
+    const width = ((mEnd - mStart) / totalDays) * 100;
+    return {offset, width};
+  };
+
+  const statusColor = {done:'var(--success)',pending:'var(--muted)',warning:'var(--warn)','in-progress':'var(--brand-cyan)'};
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{className:'gantt-container'},
+        React.createElement('div',{className:'gantt-head'},
+          React.createElement('h2',null,'Construction Schedule — Longleaf Amenity'),
+          React.createElement('p',{style:{color:'var(--muted)',fontSize:13,marginTop:4}},'Project Timeline: June 2026 — August 2027 · '+totalDays+' days')
+        ),
+
+        React.createElement('div',{className:'gantt-wrapper'},
+          React.createElement('div',{className:'gantt-sidebar'},
+            React.createElement('div',{className:'gantt-header-row'},
+              React.createElement('div',{className:'gantt-name-col'},'Milestone')
+            ),
+            milestones.map(m=>
+              React.createElement('div',{key:m.id,className:'gantt-row',style:{borderBottom:'1px solid var(--border)'}},
+                React.createElement('div',{className:'gantt-name-col',title:m.name},
+                  React.createElement('div',{style:{fontSize:12,fontWeight:600,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},m.name),
+                  React.createElement('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}},
+                    new Date(m.start).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' → '+
+                    new Date(m.end).toLocaleDateString('en-US',{month:'short',day:'numeric'})
+                  )
+                )
+              )
+            )
+          ),
+
+          React.createElement('div',{className:'gantt-chart'},
+            React.createElement('div',{className:'gantt-header-row'},
+              React.createElement('div',{className:'gantt-chart-col',style:{position:'relative',height:40}},
+                React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,fontWeight:600,color:'var(--muted)',height:'100%',alignItems:'center'}},
+                  React.createElement('span',null,'Jun'),
+                  React.createElement('span',null,'Sep'),
+                  React.createElement('span',null,'Dec'),
+                  React.createElement('span',null,'Mar'),
+                  React.createElement('span',null,'Jun'),
+                  React.createElement('span',null,'Aug')
+                )
+              )
+            ),
+
+            React.createElement('div',{style:{position:'relative'}},
+              React.createElement('div',{style:{position:'absolute',left:todayPercent+'%',top:0,bottom:0,width:2,background:'var(--err)',zIndex:10}}),
+              React.createElement('div',{style:{position:'absolute',left:'calc('+todayPercent+'% + 8px)',top:4,fontSize:9,color:'var(--err)',fontWeight:700,zIndex:10}},'TODAY'),
+
+              milestones.map(m=>{
+                const {offset,width} = getBarPercent(m.start, m.end);
+                const isComplete = m.status === 'done';
+                const isActive = m.status === 'in-progress';
+                return React.createElement('div',{key:m.id,className:'gantt-row',style:{borderBottom:'1px solid var(--border)'}},
+                  React.createElement('div',{className:'gantt-chart-col'},
+                    React.createElement('div',{style:{position:'relative',height:32,marginTop:4}},
+                      React.createElement('div',{style:{
+                        position:'absolute',
+                        left:offset+'%',
+                        width:width+'%',
+                        height:'100%',
+                        background:isComplete?'var(--success)':isActive?'var(--brand-cyan)':'var(--muted)',
+                        borderRadius:2,
+                        opacity:isComplete?1:0.7,
+                        display:'flex',
+                        alignItems:'center',
+                        paddingLeft:8,
+                        color:'white',
+                        fontSize:10,
+                        fontWeight:600,
+                        overflow:'hidden'
+                      }},
+                        m.progress > 10 && React.createElement('span',null,m.progress+'%')
+                      )
+                    )
+                  )
+                );
+              })
+            )
+          )
+        ),
+
+        React.createElement('div',{style:{marginTop:32,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16}},
+          React.createElement('div',{className:'card',style:{border:'1px solid var(--border)'}},
+            React.createElement('h4',{style:{fontSize:12,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},
+              React.createElement('span',{style:{display:'inline-block',width:8,height:8,background:'var(--success)',borderRadius:'50%',marginRight:6}}),
+              'Completed'
+            ),
+            React.createElement('p',{style:{fontSize:13,fontWeight:600,marginTop:8}},
+              milestones.filter(m=>m.status==='done').length+' of '+milestones.length+' milestones'
+            )
+          ),
+          React.createElement('div',{className:'card',style:{border:'1px solid var(--border)'}},
+            React.createElement('h4',{style:{fontSize:12,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},
+              React.createElement('span',{style:{display:'inline-block',width:8,height:8,background:'var(--brand-cyan)',borderRadius:'50%',marginRight:6}}),
+              'In Progress'
+            ),
+            React.createElement('p',{style:{fontSize:13,fontWeight:600,marginTop:8}},
+              milestones.filter(m=>m.status==='in-progress').length+' active'
+            )
+          ),
+          React.createElement('div',{className:'card',style:{border:'1px solid var(--border)'}},
+            React.createElement('h4',{style:{fontSize:12,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},
+              React.createElement('span',{style:{display:'inline-block',width:8,height:8,background:'var(--muted)',borderRadius:'50%',marginRight:6}}),
+              'Pending'
+            ),
+            React.createElement('p',{style:{fontSize:13,fontWeight:600,marginTop:8}},
+              milestones.filter(m=>m.status==='pending').length+' upcoming'
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{GanttChart});
+
+/* Budget & Cost Control */
+function Budget(){
+  useSync();
+  const D=window.DR, [open,setOpen]=useState('02-000');
+  const tot=D.divisions.reduce((a,d)=>({b:a.b+d.budget,c:a.c+d.committed}),{b:0,c:0});
+  const coTotal=D.coTotal();
+
+  const Row=(d)=>{
+    const pct=d.budget?Math.round(d.committed/d.budget*100):0;
+    const rem=d.budget-d.committed;
+    const hasSub=!!D.subDetail[d.code];
+    const isOpen=open===d.code;
+    return React.createElement(React.Fragment,{key:d.code},
+      React.createElement('tr',{onClick:hasSub?()=>setOpen(isOpen?null:d.code):null,style:{cursor:hasSub?'pointer':'default'}},
+        React.createElement('td',{className:'code'},
+          hasSub&&React.createElement('span',{style:{display:'inline-block',width:14,transform:isOpen?'rotate(90deg)':'none',transition:'.15s',color:'var(--brand-blue)'}},'▸'),
+          ' '+d.code),
+        React.createElement('td',{className:'strong'},d.name),
+        React.createElement('td',{className:'num'},D.usd(d.budget)),
+        React.createElement('td',{className:'num'},D.usd(d.committed)),
+        React.createElement('td',{className:'num',style:{color:rem<0?'var(--bad)':'var(--ink-2)'}},D.usd(rem)),
+        React.createElement('td',null,
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
+            React.createElement('div',{className:'bar-mini'},React.createElement('i',{style:{width:Math.min(100,pct)+'%'}})),
+            React.createElement('span',{className:'tnum',style:{fontSize:12.5,fontWeight:700,color:'var(--ink-2)',width:34,textAlign:'right'}},pct+'%')
+          )
+        )
+      ),
+      hasSub&&isOpen&&D.subDetail[d.code].map(s=>{
+        const sp=s.budget?Math.round(s.committed/s.budget*100):0;
+        return React.createElement('tr',{key:s.code,style:{background:'var(--card-tint)'}},
+          React.createElement('td',{className:'code',style:{paddingLeft:34,opacity:.8,fontSize:11.5}},s.code),
+          React.createElement('td',{style:{color:'var(--muted)',paddingLeft:0}},s.name),
+          React.createElement('td',{className:'num',style:{fontWeight:500}},D.usd(s.budget)),
+          React.createElement('td',{className:'num',style:{fontWeight:500}},D.usd(s.committed)),
+          React.createElement('td',{className:'num',style:{fontWeight:500}},D.usd(s.budget-s.committed)),
+          React.createElement('td',null,React.createElement('span',{style:{fontSize:12,color:'var(--faint)',fontWeight:600}},sp+'% committed'))
+        );
+      })
+    );
+  };
+
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'page-head'},
+      React.createElement('div',null,
+        React.createElement('h1',null,'Budget & Cost Control'),
+        React.createElement('div',{className:'sub'},
+          React.createElement('span',{className:'chip'},React.createElement(Icon.wallet),'Revised contract '+D.usd(D.budget.current)),
+          React.createElement('span',{className:'chip'},React.createElement(Icon.edit),(coTotal>0?D.executedCOs().length+' approved CO'+(D.executedCOs().length>1?'s':'')+' · +'+D.usd(coTotal):'No change orders'))
+        )
+      ),
+      React.createElement('button',{className:'btn btn--primary'},React.createElement(Icon.download),'Export Cost Report')
+    ),
+
+    React.createElement('div',{className:'grid kpis'},
+      React.createElement(Kpi,{label:'Original Contract',val:D.usdK(D.budget.original),sub:'GMP baseline',icon:'doc',tone:'navy'}),
+      React.createElement(Kpi,{label:'Revised Contract',val:D.usdK(D.budget.current),sub:(coTotal>0?'+'+D.usdK(coTotal)+' change orders':'no changes'),icon:'wallet',tone:'cyan'}),
+      React.createElement(Kpi,{label:'Committed to Date',val:D.usdK(D.budget.committed),sub:(D.budget.current?Math.round(D.budget.committed/D.budget.current*100):0)+'% of budget',icon:'check',tone:'green'}),
+      React.createElement(Kpi,{label:'Contingency Variance',val:D.usdK(D.budget.variance),sub:(D.budget.variancePct||0)+'% of budget',icon:'trend',tone:'red'})
+    ),
+
+    React.createElement('div',{className:'card tablecard'},
+      React.createElement('div',{className:'card__h'},
+        React.createElement('h3',null,'Cost Codes by Division'),
+        React.createElement('span',{className:'meta'},'Tap a division to expand · CSI MasterFormat')
+      ),
+      React.createElement('table',{className:'tbl'},
+        React.createElement('thead',null,React.createElement('tr',null,
+          React.createElement('th',{style:{width:120}},'Code'),
+          React.createElement('th',null,'Division'),
+          React.createElement('th',{style:{textAlign:'right'}},'Budget'),
+          React.createElement('th',{style:{textAlign:'right'}},'Committed'),
+          React.createElement('th',{style:{textAlign:'right'}},'Remaining'),
+          React.createElement('th',{style:{width:200}},'% Committed')
+        )),
+        React.createElement('tbody',null,
+          D.divisions.map(Row),
+          React.createElement('tr',{className:'div'},
+            React.createElement('td',null,''),
+            React.createElement('td',null,'Total — Hard Costs'),
+            React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tot.b)),
+            React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tot.c)),
+            React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tot.b-tot.c)),
+            React.createElement('td',null,React.createElement('span',{style:{fontSize:12.5,fontWeight:700,color:'var(--navy)'}},(tot.b?Math.round(tot.c/tot.b*100):0)+'% committed'))
+          )
+        )
+      )
+    )
+  );
+}
+window.Budget=Budget;
+
+/* Document Management */
+function DocumentManager(){
+  const [docs, setDocs] = React.useState([]);
+  const [filter, setFilter] = React.useState('all');
+  const [uploadModal, setUploadModal] = React.useState(false);
+  const [docName, setDocName] = React.useState('');
+  const [docType, setDocType] = React.useState('rfi');
+
+  const types = {
+    rfi:'RFI',
+    submittal:'Submittal',
+    spec:'Specification',
+    contract:'Contract',
+    permit:'Permit',
+    cert:'Certification',
+    plan:'Plan',
+    other:'Other'
+  };
+
+  const handleUpload = (e) => {
+    e.preventDefault();
+    if(!docName.trim()) return;
+    const newDoc = {
+      id: Math.random().toString(36).slice(2,9),
+      name: docName,
+      type: docType,
+      uploadedBy: 'Current User',
+      uploadedAt: new Date().toISOString(),
+      versions: [{v:1, date: new Date().toISOString(), uploadedBy:'Current User', size:'2.4 MB'}],
+      status: 'active'
+    };
+    setDocs([newDoc, ...docs]);
+    setDocName('');
+    setDocType('rfi');
+    setUploadModal(false);
+  };
+
+  const filtered = filter === 'all' ? docs : docs.filter(d => d.type === filter);
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}},
+        React.createElement('div',null,
+          React.createElement('h2',{style:{margin:'0 0 6px 0'}},docs.length+' Documents'),
+          React.createElement('p',{style:{color:'var(--muted)',fontSize:12,margin:0}},'Specifications, RFIs, Submittals, Permits & Plans')
+        ),
+        React.createElement('button',{onClick:()=>setUploadModal(true),className:'btn btn--primary'},'Upload Document')
+      ),
+
+      React.createElement('div',{style:{display:'flex',gap:12,marginBottom:24,flexWrap:'wrap'}},
+        React.createElement('button',{onClick:()=>setFilter('all'),style:{padding:'6px 12px',border:filter==='all'?'2px solid var(--brand-cyan)':'1px solid var(--border)',background:filter==='all'?'rgba(29,180,232,.1)':'white',borderRadius:4,cursor:'pointer',fontSize:12,fontWeight:600,color:filter==='all'?'var(--brand-cyan)':'var(--ink)'}},'All Documents'),
+        Object.entries(types).map(([k,v])=>
+          React.createElement('button',{key:k,onClick:()=>setFilter(k),style:{padding:'6px 12px',border:filter===k?'2px solid var(--brand-cyan)':'1px solid var(--border)',background:filter===k?'rgba(29,180,232,.1)':'white',borderRadius:4,cursor:'pointer',fontSize:12,fontWeight:600,color:filter===k?'var(--brand-cyan)':'var(--ink)'}},v)
+        )
+      ),
+
+      React.createElement('div',{className:'tbl-wrap'},
+        React.createElement('table',{className:'tbl'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,
+              React.createElement('th',null,'Document'),
+              React.createElement('th',null,'Type'),
+              React.createElement('th',null,'Uploaded'),
+              React.createElement('th',null,'Versions'),
+              React.createElement('th',{style:{width:100}},'Action')
+            )
+          ),
+          React.createElement('tbody',null,
+            filtered.map(d=>React.createElement('tr',{key:d.id},
+              React.createElement('td',{style:{fontWeight:600}},d.name),
+              React.createElement('td',null,React.createElement('span',{style:{background:'var(--brand-cyan)',color:'white',padding:'2px 8px',borderRadius:3,fontSize:10,fontWeight:600}},types[d.type])),
+              React.createElement('td',{style:{color:'var(--muted)',fontSize:12}},new Date(d.uploadedAt).toLocaleDateString()),
+              React.createElement('td',{style:{color:'var(--muted)',fontSize:12}},d.versions.length+' versions'),
+              React.createElement('td',null,
+                React.createElement('button',{style:{background:'none',border:'none',color:'var(--brand-cyan)',cursor:'pointer',fontSize:12,fontWeight:600}},'Download'),
+                React.createElement('span',{style:{margin:'0 6px',color:'var(--border)'}},'|'),
+                React.createElement('button',{style:{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',fontSize:12,fontWeight:600}},'More')
+              )
+            ))
+          )
+        )
+      )
+    ),
+
+    uploadModal && React.createElement('div',{className:'modal-overlay',onClick:()=>setUploadModal(false)},
+      React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+        React.createElement('div',{className:'modal__head'},
+          React.createElement('h2',null,'Upload Document'),
+          React.createElement('button',{className:'modal__close',onClick:()=>setUploadModal(false)},'✕')
+        ),
+        React.createElement('form',{onSubmit:handleUpload,className:'modal__body'},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',null,'Document Name'),
+            React.createElement('input',{type:'text',placeholder:'e.g., Structural Steel Submittal',value:docName,onChange:(e)=>setDocName(e.target.value),autoFocus:true})
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',null,'Document Type'),
+            React.createElement('select',{value:docType,onChange:(e)=>setDocType(e.target.value)},
+              Object.entries(types).map(([k,v])=>React.createElement('option',{key:k,value:k},v))
+            )
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',null,'File'),
+            React.createElement('input',{type:'file',style:{padding:'8px 0'}})
+          ),
+          React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Upload')
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{DocumentManager});
+
+/* Daily Reports — Construction Diary */
+function DailyReports(){
+  const [reports, setReports] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [date, setDate] = React.useState(new Date().toISOString().split('T')[0]);
+  const [weather, setWeather] = React.useState('clear');
+  const [crew, setCrew] = React.useState('');
+  const [workDone, setWorkDone] = React.useState('');
+  const [delays, setDelays] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newReport = {
+      id: Math.random().toString(36).slice(2,9),
+      date,
+      weather,
+      crewCount: parseInt(crew)||0,
+      workDone,
+      delays,
+      submittedBy:'Current User',
+      submittedAt: new Date().toISOString()
+    };
+    setReports([newReport, ...reports]);
+    setShowNew(false);
+    setDate(new Date().toISOString().split('T')[0]);
+    setWeather('clear');
+    setCrew('');
+    setWorkDone('');
+    setDelays('');
+  };
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}},
+        React.createElement('h2',{style:{margin:0}},reports.length+' Daily Reports'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'New Report')
+      ),
+
+      reports.length === 0 ? React.createElement('div',{style:{textAlign:'center',padding:'60px 20px',color:'var(--muted)'}},
+        React.createElement('p',{style:{fontSize:14,fontWeight:500}},'No daily reports yet'),
+        React.createElement('p',{style:{fontSize:12,marginTop:8}},'Start logging construction progress')
+      ) : React.createElement('div',{style:{display:'grid',gap:12}},
+        reports.map(r=>React.createElement('div',{key:r.id,className:'card',style:{borderLeft:'4px solid var(--brand-cyan)'}},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:12}},
+            React.createElement('div',null,
+              React.createElement('div',{style:{fontSize:13,fontWeight:700}},new Date(r.date).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})),
+              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2}},r.submittedBy)
+            ),
+            React.createElement('span',{style:{background:'var(--success)',color:'white',padding:'2px 8px',borderRadius:3,fontSize:10,fontWeight:600}},
+              {clear:'☀️ Clear',cloudy:'☁️ Cloudy',rainy:'🌧️ Rainy',snow:'❄️ Snow',extreme:'⚠️ Extreme'}[r.weather]
+            )
+          ),
+          React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:12}},
+            React.createElement('div',null,
+              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600}},r.crewCount+' Crew on Site'),
+              React.createElement('div',{style:{fontSize:12,color:'var(--ink)',marginTop:4}})
+            ),
+            React.createElement('div',null,
+              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600}},'Work Completed'),
+              React.createElement('div',{style:{fontSize:12,color:'var(--ink)',marginTop:4}},r.workDone)
+            )
+          ),
+          r.delays && React.createElement('div',{style:{padding:'8px 12px',background:'rgba(255,180,90,.1)',borderRadius:4,borderLeft:'2px solid var(--warn)',fontSize:12,color:'var(--ink)'}},
+            React.createElement('strong',null,'Delays: '),r.delays
+          )
+        ))
+      ),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',style:{maxWidth:600},onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Daily Construction Report'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Date'),
+              React.createElement('input',{type:'date',value:date,onChange:(e)=>setDate(e.target.value)})
+            ),
+            React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Weather'),
+                React.createElement('select',{value:weather,onChange:(e)=>setWeather(e.target.value)},
+                  React.createElement('option',{value:'clear'},'Clear'),
+                  React.createElement('option',{value:'cloudy'},'Cloudy'),
+                  React.createElement('option',{value:'rainy'},'Rainy'),
+                  React.createElement('option',{value:'snow'},'Snow'),
+                  React.createElement('option',{value:'extreme'},'Extreme')
+                )
+              ),
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Crew on Site'),
+                React.createElement('input',{type:'number',placeholder:'e.g., 15',value:crew,onChange:(e)=>setCrew(e.target.value)})
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Work Completed'),
+              React.createElement('textarea',{placeholder:'Describe work done today...',value:workDone,onChange:(e)=>setWorkDone(e.target.value),style:{minHeight:100}})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Delays or Issues'),
+              React.createElement('textarea',{placeholder:'Note any delays, weather impacts, material shortages...',value:delays,onChange:(e)=>setDelays(e.target.value),style:{minHeight:80}})
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Submit Report')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{DailyReports});
+
+/* Change Order Tracker — admin → client approval → cross-department sync */
+function ChangeOrderTracker(){
+  useSync();
+  const D=window.DR;
+  const user=window.AUTH.getUser();
+  const isAdmin = user && (user.role==='admin'||user.role==='pm');
+  const [showNew,setShowNew]=useState(false);
+  const [detailId,setDetailId]=useState(null);
+  const [reviewId,setReviewId]=useState(null);
+  const [toast,setToast]=useState(null);
+  const [f,setF]=useState({title:'',div:'02-900',costImpact:'',scheduleDays:'',reason:''});
+
+  const co=id=>D.find(id);
+  const showToast=msg=>{ setToast(msg); clearTimeout(window.__coT); window.__coT=setTimeout(()=>setToast(null),4600); };
+  const divName=code=>{ const c=(code||'').slice(0,2)+'-000'; const d=D.divisions.find(x=>x.code===c); return d?d.name:code; };
+  const statusPill=s=>{ const m={draft:['idle','Draft'],sent:['warn','Awaiting Client'],executed:['ok','Approved · Synced'],rejected:['bad','Rejected']}[s];
+    return React.createElement('span',{className:'pill pill--'+m[0]},m[1]); };
+
+  const submitNew=e=>{ e.preventDefault();
+    if(!f.title.trim()||!f.costImpact) return;
+    const c=D.coCreate({title:f.title.trim(),div:f.div,costImpact:parseFloat(f.costImpact),scheduleDays:parseInt(f.scheduleDays)||0,reason:f.reason.trim()});
+    setShowNew(false); setF({title:'',div:'02-900',costImpact:'',scheduleDays:'',reason:''});
+    showToast({t:c.id+' drafted',s:'Review, then send to '+D.parties.client.org+' for approval.'});
+  };
+  const sendToClient=id=>{ D.coSend(id); setDetailId(null);
+    showToast({t:co(id).id+' sent to client',s:'Emailed to '+D.parties.client.org+' for e-signature.'}); };
+  const decide=(id,ok,note)=>{ D.coDecide(id,ok,note); setReviewId(null);
+    if(ok) showToast({t:co(id).id+' approved & distributed',s:'Copies to '+D.parties.admin.org+' + '+D.parties.client.org+'. Budget & schedule synced.'});
+    else   showToast({t:co(id).id+' rejected',s:'Copies sent to both parties · no budget change applied.'}); };
+
+  const exec=D.executedCOs();
+
+  // ---- Register row ----
+  const Row=o=>React.createElement('tr',{key:o.id,style:{cursor:'pointer'},onClick:()=>setDetailId(o.id)},
+    React.createElement('td',{className:'code'},o.id),
+    React.createElement('td',{className:'strong'},o.title),
+    React.createElement('td',{style:{color:'var(--muted)',fontSize:12.5}},divName(o.div)),
+    React.createElement('td',{className:'num'},'+'+D.usd(o.costImpact)),
+    React.createElement('td',{style:{color:'var(--muted)'}},o.scheduleDays?('+'+o.scheduleDays+'d'):'—'),
+    React.createElement('td',null,statusPill(o.status)),
+    React.createElement('td',{onClick:e=>e.stopPropagation()},
+      o.status==='draft' && isAdmin
+        ? React.createElement('button',{className:'btn btn--primary btn--sm',onClick:()=>sendToClient(o.id)},React.createElement(Icon.mail),'Send to Client')
+        : o.status==='sent'
+          ? React.createElement('button',{className:'btn btn--ghost btn--sm',onClick:()=>setReviewId(o.id)},React.createElement(Icon.clipboard),isAdmin?'Client Review':'Review & Sign')
+          : React.createElement('button',{className:'btn btn--ghost btn--sm',onClick:()=>setDetailId(o.id)},'View')
+    )
+  );
+
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'page-head'},
+      React.createElement('div',null,
+        React.createElement('h1',null,'Change Orders'),
+        React.createElement('div',{className:'sub'},
+          React.createElement('span',{className:'chip'},React.createElement(Icon.wallet),'Executed '+D.usd(D.coTotal())+' · revised contract '+D.usd(D.budget.current)),
+          React.createElement('span',{className:'chip'},React.createElement(Icon.clock),D.pendingCOs()+' awaiting client signature')
+        )
+      ),
+      isAdmin && React.createElement('button',{className:'btn btn--primary',onClick:()=>setShowNew(true)},React.createElement(Icon.edit),'New Change Order')
+    ),
+
+    React.createElement('div',{className:'grid kpis'},
+      React.createElement(Kpi,{label:'Executed CO Value',val:D.usdK(D.coTotal()),sub:'synced to budget',icon:'wallet',tone:'cyan'}),
+      React.createElement(Kpi,{label:'Approved',val:String(exec.length),sub:'of '+D.changeOrders.length+' total',icon:'check',tone:'green'}),
+      React.createElement(Kpi,{label:'Awaiting Client',val:String(D.pendingCOs()),sub:'out for signature',icon:'clock',tone:'amber'}),
+      React.createElement(Kpi,{label:'Schedule Impact',val:(D.coDays()>0?'+'+D.coDays()+'d':'0d'),sub:'to completion',icon:'cal',tone:'navy'})
+    ),
+
+    React.createElement('div',{className:'card tablecard'},
+      React.createElement('div',{className:'card__h'},
+        React.createElement('h3',null,'Change Order Register'),
+        React.createElement('span',{className:'meta'},'Tap a row for the full approval trail')
+      ),
+      React.createElement('table',{className:'tbl'},
+        React.createElement('thead',null,React.createElement('tr',null,
+          React.createElement('th',{style:{width:88}},'CO #'),
+          React.createElement('th',null,'Description'),
+          React.createElement('th',null,'Division'),
+          React.createElement('th',{style:{textAlign:'right'}},'Cost'),
+          React.createElement('th',{style:{width:90}},'Schedule'),
+          React.createElement('th',{style:{width:150}},'Status'),
+          React.createElement('th',{style:{width:160}},'Action')
+        )),
+        React.createElement('tbody',null, D.changeOrders.map(Row))
+      )
+    ),
+
+    showNew && React.createElement(NewCOModal,{f,setF,onClose:()=>setShowNew(false),onSubmit:submitNew,D}),
+    detailId && React.createElement(CODetailModal,{o:co(detailId),D,divName,statusPill,isAdmin,
+      onClose:()=>setDetailId(null),onSend:()=>sendToClient(detailId),onReview:()=>{setDetailId(null);setReviewId(detailId);}}),
+    reviewId && React.createElement(ClientReviewModal,{o:co(reviewId),D,divName,onClose:()=>setReviewId(null),onDecide:decide}),
+
+    toast && React.createElement('div',{className:'co-toast'},
+      React.createElement(Icon.check),
+      React.createElement('div',null,
+        React.createElement('b',null,toast.t),
+        React.createElement('div',{className:'sub'},toast.s)
+      )
+    )
+  );
+}
+
+function NewCOModal({f,setF,onClose,onSubmit,D}){
+  const set=(k,v)=>setF(s=>({...s,[k]:v}));
+  return React.createElement('div',{className:'modal-overlay',onClick:onClose},
+    React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+      React.createElement('div',{className:'modal__head'},
+        React.createElement('h2',null,'New Change Order'),
+        React.createElement('button',{className:'modal__close',onClick:onClose},React.createElement(Icon.chevron))
+      ),
+      React.createElement('form',{onSubmit,className:'modal__body'},
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',null,'Title'),
+          React.createElement('input',{placeholder:'e.g. Upgraded pool-deck pavers',value:f.title,onChange:e=>set('title',e.target.value)})
+        ),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',null,'Affected Division'),
+          React.createElement('select',{value:f.div,onChange:e=>set('div',e.target.value)},
+            D.divisions.map(d=>React.createElement('option',{key:d.code,value:d.code},d.code+' · '+d.name)))
+        ),
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',null,'Cost Impact ($)'),
+            React.createElement('input',{type:'number',placeholder:'0',value:f.costImpact,onChange:e=>set('costImpact',e.target.value)})
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',null,'Schedule Impact (days)'),
+            React.createElement('input',{type:'number',placeholder:'0',value:f.scheduleDays,onChange:e=>set('scheduleDays',e.target.value)})
+          )
+        ),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',null,'Reason / Justification'),
+          React.createElement('textarea',{className:'co-input',placeholder:'Why is this change needed?',value:f.reason,onChange:e=>set('reason',e.target.value)})
+        ),
+        React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%',justifyContent:'center'}},'Save Draft')
+      )
+    )
+  );
+}
+
+function COTimeline({o,D}){
+  const steps=[
+    {t:'Created by '+(o.createdBy||'—'),d:o.createdAt,state:'done',icon:'edit'},
+    {t:'Sent to '+D.parties.client.org,d:o.sentAt||'Pending',state:o.sentAt?'done':'idle',icon:'mail'},
+    o.status==='rejected'
+      ? {t:'Rejected by '+(o.decidedBy||D.parties.client.org),d:o.decidedAt,state:'bad',icon:'alert'}
+      : {t:'Approved by '+(o.decidedBy||D.parties.client.org),d:o.decidedAt||'Awaiting signature',state:o.status==='executed'?'done':(o.status==='sent'?'active':'idle'),icon:'check'},
+    {t:'Copies distributed · departments synced',d:o.executedAt||'—',state:o.status==='executed'?'done':'idle',icon:'users'}
+  ];
+  return React.createElement('div',{className:'co-tl'},
+    steps.map((s,i)=>React.createElement('div',{key:i,className:'co-tl__step '+(s.state==='idle'?'':s.state)},
+      React.createElement('div',{className:'co-tl__dot'},React.createElement(Icon[s.icon])),
+      React.createElement('div',null,
+        React.createElement('div',{className:'co-tl__t'},s.t),
+        React.createElement('div',{className:'co-tl__d'},s.d)
+      )
+    ))
+  );
+}
+
+function CODetailModal({o,D,divName,statusPill,isAdmin,onClose,onSend,onReview}){
+  const synced=o.status==='executed';
+  return React.createElement('div',{className:'modal-overlay',onClick:onClose},
+    React.createElement('div',{className:'modal modal--wide',onClick:e=>e.stopPropagation()},
+      React.createElement('div',{className:'modal__head'},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12}},
+          React.createElement('h2',null,o.id),
+          statusPill(o.status)
+        ),
+        React.createElement('button',{className:'modal__close',onClick:onClose},React.createElement(Icon.chevron))
+      ),
+      React.createElement('div',{className:'modal__body'},
+        React.createElement('div',{className:'portal__title'},o.title),
+        React.createElement('div',{className:'portal__sub'},divName(o.div)+' · created '+o.createdAt+' by '+(o.createdBy||'—')),
+        React.createElement('div',{className:'portal__impact'},
+          React.createElement('div',{className:'impact-box'},
+            React.createElement('div',{className:'l'},'Cost Impact'),
+            React.createElement('div',{className:'v'},'+'+D.usd(o.costImpact))),
+          React.createElement('div',{className:'impact-box'},
+            React.createElement('div',{className:'l'},'Schedule Impact'),
+            React.createElement('div',{className:'v'},o.scheduleDays?('+'+o.scheduleDays+' days'):'None'))
+        ),
+        o.reason && React.createElement('div',{className:'reasonbox'},o.reason),
+        React.createElement('div',{style:{fontWeight:800,fontSize:12,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',margin:'4px 0 12px'}},'Approval Trail'),
+        React.createElement(COTimeline,{o,D}),
+        o.clientNote && React.createElement('div',{className:'reasonbox',style:{borderLeftColor:'var(--ok)',marginTop:14}},
+          React.createElement('b',null,D.parties.client.org+': '),o.clientNote),
+
+        synced && React.createElement('div',{className:'syncbox'},
+          React.createElement('div',{className:'syncbox__h'},React.createElement(Icon.check),'Synced across departments'),
+          React.createElement('div',{className:'syncrow'},
+            React.createElement('span',{className:'a'},'Budget · revised contract'),
+            React.createElement('span',{className:'b'},D.usd(D.budget.original)+'  →  '+D.usd(D.budget.current))),
+          React.createElement('div',{className:'syncrow'},
+            React.createElement('span',{className:'a'},divName(o.div)+' line'),
+            React.createElement('span',{className:'b'},'+'+D.usd(o.costImpact))),
+          o.scheduleDays>0 && React.createElement('div',{className:'syncrow'},
+            React.createElement('span',{className:'a'},'Schedule · substantial completion'),
+            React.createElement('span',{className:'b'},'+'+o.scheduleDays+' days')),
+          React.createElement('div',{className:'distchips'},
+            (o.distributed||[]).map((p,i)=>React.createElement('span',{key:i,className:'distchip'},React.createElement(Icon.check),'Copy · '+p)))
+        ),
+
+        o.status==='draft' && isAdmin && React.createElement('button',{className:'btn btn--primary',style:{width:'100%',justifyContent:'center',marginTop:18},onClick:onSend},React.createElement(Icon.mail),'Send to '+D.parties.client.org+' for Approval'),
+        o.status==='sent' && React.createElement('button',{className:'btn btn--ghost',style:{width:'100%',justifyContent:'center',marginTop:18},onClick:onReview},React.createElement(Icon.clipboard),'Open Client Review Portal')
+      )
+    )
+  );
+}
+
+function ClientReviewModal({o,D,divName,onClose,onDecide}){
+  const [note,setNote]=useState('');
+  const [sig,setSig]=useState(D.parties.client.name);
+  return React.createElement('div',{className:'modal-overlay',onClick:onClose},
+    React.createElement('div',{className:'modal modal--wide',onClick:e=>e.stopPropagation()},
+      React.createElement('div',{className:'portal__letterhead'},
+        React.createElement('img',{src:'assets/dunrite-white.png',alt:'DunRite'}),
+        React.createElement('div',{style:{textAlign:'right'}},
+          React.createElement('div',{className:'portal__tag'},'Client Approval Portal'),
+          React.createElement('div',{style:{fontSize:12,color:'#AEBFD0',marginTop:2}},o.id)
+        )
+      ),
+      React.createElement('div',{className:'portal__body'},
+        React.createElement('div',{className:'portal__sub'},'From '+D.parties.admin.org+'  ·  To '+D.parties.client.org+'  ·  '+D.project.name),
+        React.createElement('div',{className:'portal__title'},o.title),
+        React.createElement('div',{className:'portal__sub'},divName(o.div)),
+        React.createElement('div',{className:'portal__impact'},
+          React.createElement('div',{className:'impact-box'},
+            React.createElement('div',{className:'l'},'Added Cost'),
+            React.createElement('div',{className:'v'},'+'+D.usd(o.costImpact))),
+          React.createElement('div',{className:'impact-box'},
+            React.createElement('div',{className:'l'},'Added Time'),
+            React.createElement('div',{className:'v'},o.scheduleDays?('+'+o.scheduleDays+' days'):'None'))
+        ),
+        o.reason && React.createElement('div',{className:'reasonbox'},o.reason),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',null,'Signature (type full name)'),
+          React.createElement('input',{value:sig,onChange:e=>setSig(e.target.value)})
+        ),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',null,'Note to '+D.parties.admin.org+' (optional)'),
+          React.createElement('textarea',{className:'co-input',placeholder:'Add a comment…',value:note,onChange:e=>setNote(e.target.value)})
+        ),
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginTop:4}},
+          React.createElement('button',{className:'btn btn--ghost',style:{justifyContent:'center',color:'var(--bad)',borderColor:'var(--bad-bg)'},
+            onClick:()=>onDecide(o.id,false,note||'Rejected by '+sig)},React.createElement(Icon.alert),'Reject'),
+          React.createElement('button',{className:'btn btn--primary',style:{justifyContent:'center',background:'var(--ok)',boxShadow:'none'},
+            disabled:!sig.trim(),onClick:()=>onDecide(o.id,true,note||('Approved by '+sig))},React.createElement(Icon.check),'Approve & Sign')
+        ),
+        React.createElement('div',{style:{fontSize:11.5,color:'var(--muted)',textAlign:'center',marginTop:14}},
+          'On approval, signed copies are emailed to both parties and the change is synced to budget & schedule automatically.')
+      )
+    )
+  );
+}
+
+Object.assign(window,{ChangeOrderTracker});
+
+/* Invoice & Requisition Management */
+function InvoiceManager(){
+  const [invoices, setInvoices] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [vendor, setVendor] = React.useState('');
+  const [amount, setAmount] = React.useState('');
+  const [dueDate, setDueDate] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!vendor.trim() || !amount) return;
+    const newInv = {
+      id: 'INV-'+(10000+invoices.length),
+      vendor,
+      amount: parseFloat(amount),
+      dueDate,
+      status: 'received',
+      approvals: 0,
+      requiredApprovals: 2,
+      receivedAt: new Date().toISOString()
+    };
+    setInvoices([newInv, ...invoices]);
+    setShowNew(false);
+    setVendor('');
+    setAmount('');
+    setDueDate('');
+  };
+
+  const totalInvoiced = invoices.reduce((s,i)=>s+i.amount,0);
+  const totalApproved = invoices.filter(i=>i.approvals>=i.requiredApprovals).reduce((s,i)=>s+i.amount,0);
+  const totalPending = invoices.filter(i=>i.approvals<i.requiredApprovals).reduce((s,i)=>s+i.amount,0);
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:16,marginBottom:24}},
+        React.createElement('div',{className:'card',style:{borderLeft:'4px solid var(--brand-cyan)'}},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}},
+            'Total Invoiced'
+          ),
+          React.createElement('div',{style:{fontSize:22,fontWeight:700,marginTop:8}},
+            '$'+totalInvoiced.toLocaleString('en-US',{maximumFractionDigits:0})
+          )
+        ),
+        React.createElement('div',{className:'card',style:{borderLeft:'4px solid var(--success)'}},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}},
+            'Approved & Paid'
+          ),
+          React.createElement('div',{style:{fontSize:22,fontWeight:700,marginTop:8}},
+            '$'+totalApproved.toLocaleString('en-US',{maximumFractionDigits:0})
+          )
+        ),
+        React.createElement('div',{className:'card',style:{borderLeft:'4px solid var(--warn)'}},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.05em'}},
+            '⏳ Pending Approval'
+          ),
+          React.createElement('div',{style:{fontSize:22,fontWeight:700,marginTop:8}},
+            '$'+totalPending.toLocaleString('en-US',{maximumFractionDigits:0})
+          )
+        )
+      ),
+
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}},
+        React.createElement('h3',{style:{margin:0,fontSize:16,fontWeight:700}},invoices.length+' Invoices'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'Receive Invoice')
+      ),
+
+      React.createElement('div',{className:'tbl-wrap'},
+        React.createElement('table',{className:'tbl'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,
+              React.createElement('th',null,'Invoice #'),
+              React.createElement('th',null,'Vendor'),
+              React.createElement('th',{textAlign:'right'},'Amount'),
+              React.createElement('th',null,'Due Date'),
+              React.createElement('th',null,'Approvals'),
+              React.createElement('th',null,'Status')
+            )
+          ),
+          React.createElement('tbody',null,
+            invoices.map(i=>React.createElement('tr',{key:i.id},
+              React.createElement('td',{className:'code',fontWeight:600},i.id),
+              React.createElement('td',null,i.vendor),
+              React.createElement('td',{textAlign:'right',fontWeight:600},'$'+i.amount.toLocaleString()),
+              React.createElement('td',{color:'var(--muted)',fontSize:12},new Date(i.dueDate).toLocaleDateString()),
+              React.createElement('td',null,i.approvals+'/'+i.requiredApprovals),
+              React.createElement('td',null,
+                React.createElement('span',{style:{background:i.approvals>=i.requiredApprovals?'var(--success)':'var(--warn)',color:'white',padding:'3px 8px',borderRadius:3,fontSize:10,fontWeight:600}},
+                  i.approvals>=i.requiredApprovals?'Approved':'Pending'
+                )
+              )
+            ))
+          )
+        )
+      ),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Receive Invoice'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Vendor'),
+              React.createElement('input',{type:'text',placeholder:'Vendor name',value:vendor,onChange:(e)=>setVendor(e.target.value)})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Amount ($)'),
+              React.createElement('input',{type:'number',placeholder:'0.00',value:amount,onChange:(e)=>setAmount(e.target.value)})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Due Date'),
+              React.createElement('input',{type:'date',value:dueDate,onChange:(e)=>setDueDate(e.target.value)})
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Log Invoice')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{InvoiceManager});
+
+/* Issue Tracker — Defects, Punch List */
+function IssueTracker(){
+  const [issues, setIssues] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [title, setTitle] = React.useState('');
+  const [desc, setDesc] = React.useState('');
+  const [priority, setPriority] = React.useState('normal');
+  const [location, setLocation] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!title.trim()) return;
+    const newIssue = {
+      id: 'ISS-'+(5000+issues.length),
+      title,
+      description: desc,
+      priority,
+      location,
+      status: 'open',
+      createdAt: new Date().toISOString(),
+      createdBy: 'Current User'
+    };
+    setIssues([newIssue, ...issues]);
+    setShowNew(false);
+    setTitle('');
+    setDesc('');
+    setPriority('normal');
+    setLocation('');
+  };
+
+  const priorityColor = {high:'var(--err)',normal:'var(--warn)',low:'var(--success)'};
+  const statusColor = {open:'var(--warn)',in_progress:'var(--brand-cyan)',resolved:'var(--success)'};
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:24}},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Open Issues'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8,color:'var(--err)'}},
+            issues.filter(i=>i.status==='open').length
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'In Progress'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8,color:'var(--brand-cyan)'}},
+            issues.filter(i=>i.status==='in_progress').length
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Resolved'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8,color:'var(--success)'}},
+            issues.filter(i=>i.status==='resolved').length
+          )
+        )
+      ),
+
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}},
+        React.createElement('h3',{style:{margin:0,fontSize:16,fontWeight:700}},issues.length+' Issues'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'Report Issue')
+      ),
+
+      issues.map(i=>React.createElement('div',{key:i.id,className:'card',style:{borderLeft:'4px solid '+priorityColor[i.priority],marginBottom:12}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:8}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontWeight:700,fontSize:13}},i.id+' — '+i.title),
+            i.location && React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},i.location)
+          ),
+          React.createElement('span',{style:{background:statusColor[i.status],color:'white',padding:'2px 8px',borderRadius:3,fontSize:10,fontWeight:600}},
+            {open:'Open',in_progress:'In Progress',resolved:'Resolved'}[i.status]
+          )
+        ),
+        i.description && React.createElement('p',{style:{fontSize:12,color:'var(--ink)',margin:'8px 0'}},i.description),
+        React.createElement('div',{style:{fontSize:10,color:'var(--muted)',marginTop:8}},
+          'Reported ',new Date(i.createdAt).toLocaleDateString(),' by ',i.createdBy
+        )
+      )),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Report Issue'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Title'),
+              React.createElement('input',{type:'text',placeholder:'What is the issue?',value:title,onChange:(e)=>setTitle(e.target.value),autoFocus:true})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Description'),
+              React.createElement('textarea',{placeholder:'Details...',value:desc,onChange:(e)=>setDesc(e.target.value),style:{minHeight:80}})
+            ),
+            React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Priority'),
+                React.createElement('select',{value:priority,onChange:(e)=>setPriority(e.target.value)},
+                  React.createElement('option',{value:'high'},'High'),
+                  React.createElement('option',{value:'normal'},'Normal'),
+                  React.createElement('option',{value:'low'},'Low')
+                )
+              ),
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Location'),
+                React.createElement('input',{type:'text',placeholder:'e.g., Building A, 2nd Floor',value:location,onChange:(e)=>setLocation(e.target.value)})
+              )
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Report')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{IssueTracker});
+
+/* Safety Incident Log — OSHA Compliance */
+function SafetyLog(){
+  const [incidents, setIncidents] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [type, setType] = React.useState('near-miss');
+  const [desc, setDesc] = React.useState('');
+  const [location, setLocation] = React.useState('');
+  const [injuries, setInjuries] = React.useState('no');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!desc.trim()) return;
+    const newInc = {
+      id: 'SAF-'+(3000+incidents.length),
+      type,
+      description: desc,
+      location,
+      injuries: injuries==='yes',
+      reportedAt: new Date().toISOString(),
+      reportedBy: 'Current User',
+      status: 'open',
+      investigationNotes: ''
+    };
+    setIncidents([newInc, ...incidents]);
+    setShowNew(false);
+    setType('near-miss');
+    setDesc('');
+    setLocation('');
+    setInjuries('no');
+  };
+
+  const typeColor = {'accident':'var(--err)','injury':'var(--err)','near-miss':'var(--warn)','hazard':'var(--warn)'};
+  const typeIcon = {'accident':'⚠️','injury':'🚑','near-miss':'⚡','hazard':'🔴'};
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:24}},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Injury Incidents'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8,color:'var(--err)'}},
+            incidents.filter(i=>i.injuries).length
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Near Misses'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8,color:'var(--warn)'}},
+            incidents.filter(i=>i.type==='near-miss').length
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Total Reports'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8}},
+            incidents.length
+          )
+        )
+      ),
+
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}},
+        React.createElement('h3',{style:{margin:0,fontSize:16,fontWeight:700}},'Incident Reports'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'Report Incident')
+      ),
+
+      incidents.map(i=>React.createElement('div',{key:i.id,className:'card',style:{borderLeft:'4px solid '+typeColor[i.type],marginBottom:12}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:8}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontWeight:700,fontSize:13}},typeIcon[i.type]+' '+i.id),
+            i.location && React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},i.location)
+          ),
+          React.createElement('span',{style:{background:i.injuries?'var(--err)':'var(--warn)',color:'white',padding:'2px 8px',borderRadius:3,fontSize:10,fontWeight:600}},
+            i.injuries?'Injury':'Near Miss'
+          )
+        ),
+        React.createElement('p',{style:{fontSize:12,color:'var(--ink)',margin:'8px 0'}},i.description),
+        React.createElement('div',{style:{fontSize:10,color:'var(--muted)',marginTop:8}},
+          'Reported ',new Date(i.reportedAt).toLocaleDateString(),' by ',i.reportedBy
+        )
+      )),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Report Safety Incident'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Incident Type'),
+              React.createElement('select',{value:type,onChange:(e)=>setType(e.target.value)},
+                React.createElement('option',{value:'near-miss'},'Near Miss'),
+                React.createElement('option',{value:'hazard'},'Hazard Identified'),
+                React.createElement('option',{value:'accident'},'Accident'),
+                React.createElement('option',{value:'injury'},'Injury Incident')
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Location'),
+              React.createElement('input',{type:'text',placeholder:'Where did this occur?',value:location,onChange:(e)=>setLocation(e.target.value)})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Description'),
+              React.createElement('textarea',{placeholder:'What happened? Any injuries?',value:desc,onChange:(e)=>setDesc(e.target.value),style:{minHeight:100}})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Any Injuries?'),
+              React.createElement('select',{value:injuries,onChange:(e)=>setInjuries(e.target.value)},
+                React.createElement('option',{value:'no'},'No'),
+                React.createElement('option',{value:'yes'},'Yes')
+              )
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Report Incident')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{SafetyLog});
+
+/* Equipment & Material Tracking */
+function EquipmentTracking(){
+  const [items, setItems] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [name, setName] = React.useState('');
+  const [category, setCategory] = React.useState('equipment');
+  const [quantity, setQuantity] = React.useState('');
+  const [location, setLocation] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!name.trim() || !quantity) return;
+    const newItem = {
+      id: Math.random().toString(36).slice(2,9),
+      name,
+      category,
+      quantity: parseInt(quantity),
+      location,
+      status: 'on-site',
+      addedAt: new Date().toISOString(),
+      addedBy: 'Current User'
+    };
+    setItems([newItem, ...items]);
+    setShowNew(false);
+    setName('');
+    setCategory('equipment');
+    setQuantity('');
+    setLocation('');
+  };
+
+  const categories = {equipment:'Equipment',material:'Material',tool:'Tool',vehicle:'Vehicle'};
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:24}},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Total Items'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8}},
+            items.reduce((s,i)=>s+i.quantity,0)
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Equipment'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8}},
+            items.filter(i=>i.category==='equipment').length
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--muted)',fontWeight:600,textTransform:'uppercase'}},
+            'Materials'
+          ),
+          React.createElement('div',{style:{fontSize:24,fontWeight:700,marginTop:8}},
+            items.filter(i=>i.category==='material').length
+          )
+        )
+      ),
+
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}},
+        React.createElement('h3',{style:{margin:0,fontSize:16,fontWeight:700}},items.length+' Items Tracked'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'Log Item')
+      ),
+
+      React.createElement('div',{className:'tbl-wrap'},
+        React.createElement('table',{className:'tbl'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,
+              React.createElement('th',null,'Item'),
+              React.createElement('th',null,'Category'),
+              React.createElement('th',{textAlign:'center'},'Qty'),
+              React.createElement('th',null,'Location'),
+              React.createElement('th',null,'Added')
+            )
+          ),
+          React.createElement('tbody',null,
+            items.map(i=>React.createElement('tr',{key:i.id},
+              React.createElement('td',{fontWeight:600},i.name),
+              React.createElement('td',null,React.createElement('span',{style:{background:'var(--brand-cyan)',color:'white',padding:'2px 8px',borderRadius:3,fontSize:10,fontWeight:600}},categories[i.category])),
+              React.createElement('td',{textAlign:'center',fontWeight:600},i.quantity),
+              React.createElement('td',{color:'var(--muted)',fontSize:12},i.location),
+              React.createElement('td',{color:'var(--muted)',fontSize:12},new Date(i.addedAt).toLocaleDateString())
+            ))
+          )
+        )
+      ),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Log Equipment/Material'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Item Name'),
+              React.createElement('input',{type:'text',placeholder:'e.g., Concrete Mixer',value:name,onChange:(e)=>setName(e.target.value),autoFocus:true})
+            ),
+            React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Category'),
+                React.createElement('select',{value:category,onChange:(e)=>setCategory(e.target.value)},
+                  Object.entries(categories).map(([k,v])=>React.createElement('option',{key:k,value:k},v))
+                )
+              ),
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Quantity'),
+                React.createElement('input',{type:'number',placeholder:'1',value:quantity,onChange:(e)=>setQuantity(e.target.value)})
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Location'),
+              React.createElement('input',{type:'text',placeholder:'e.g., Building A Staging Area',value:location,onChange:(e)=>setLocation(e.target.value)})
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Log Item')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{EquipmentTracking});
+
+/* Cost Forecasting & Variance Analysis */
+function CostForecasting(){
+  useSync();
+  const D=window.DR;
+  const rows=D.divisions.map(d=>{
+    const baseline=(D.divBaseline&&D.divBaseline[d.code])!=null?D.divBaseline[d.code]:d.budget;
+    const forecast=d.budget;           // revised at-completion (baseline + approved COs)
+    const variance=forecast-baseline;  // driven by executed change orders
+    return {code:d.code, desc:d.name, baseline, committed:d.committed, forecast, variance};
+  });
+  const tBase=rows.reduce((s,r)=>s+r.baseline,0);
+  const tCommit=rows.reduce((s,r)=>s+r.committed,0);
+  const tForecast=rows.reduce((s,r)=>s+r.forecast,0);
+  const variance=tForecast-tBase;
+  const varPct=tBase?((variance/tBase)*100).toFixed(1):'0.0';
+
+  return React.createElement(LogShell,{title:'Cost Forecasting',
+    chips:[{icon:'trend',t:'EAC '+D.usd(tForecast)},{icon:'edit',t:(variance!==0?D.usd(variance)+' from change orders':'On budget')}],
+    kpis:[
+      {label:'Original Contract',val:D.usdK(tBase),sub:'GMP baseline',icon:'doc',tone:'navy'},
+      {label:'Forecast at Completion',val:D.usdK(tForecast),sub:(variance>=0?'+':'')+D.usdK(variance)+' ('+varPct+'%)',icon:'trend',tone:'cyan'},
+      {label:'Committed to Date',val:D.usdK(tCommit),sub:(tForecast?Math.round(tCommit/tForecast*100):0)+'% of EAC',icon:'check',tone:'green'},
+      {label:'Variance',val:(variance>=0?'+':'')+D.usdK(variance),sub:variance===0?'no overruns':'change orders',icon:'wallet',tone:variance>0?'amber':'green'},
+    ]},
+    React.createElement(TableCard,{title:'Forecast by Division',meta:'Baseline vs forecast at completion · CSI MasterFormat',
+      head:[{t:'Code',w:90},'Division',{t:'Baseline',w:120,r:true},{t:'Committed',w:120,r:true},{t:'Forecast',w:120,r:true},{t:'Variance',w:120,r:true},{t:'Status',w:120}],
+      rows:rows.map(r=>React.createElement('tr',{key:r.code+r.desc},
+        React.createElement('td',{className:'code'},r.code),
+        React.createElement('td',{className:'strong'},r.desc),
+        React.createElement('td',{className:'num'},D.usd(r.baseline)),
+        React.createElement('td',{className:'num'},D.usd(r.committed)),
+        React.createElement('td',{className:'num',style:{fontWeight:700}},D.usd(r.forecast)),
+        React.createElement('td',{className:'num',style:{color:r.variance>0?'var(--warn)':'var(--muted)'}},(r.variance>0?'+':'')+D.usd(r.variance)),
+        React.createElement('td',null,React.createElement('span',{className:'pill pill--'+(r.variance>0?'warn':'ok')},r.variance>0?'Change Order':'On Budget'))
+      )).concat([
+        React.createElement('tr',{key:'__tot',className:'div'},
+          React.createElement('td',null,''),
+          React.createElement('td',null,'Total — Forecast at Completion'),
+          React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tBase)),
+          React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tCommit)),
+          React.createElement('td',{className:'num',style:{color:'var(--navy)'}},D.usd(tForecast)),
+          React.createElement('td',{className:'num',style:{color:'var(--navy)'}},(variance>=0?'+':'')+D.usd(variance)),
+          React.createElement('td',null,'')
+        )
+      ])
+    })
+  );
+}
+
+Object.assign(window,{CostForecasting});
+
+/* Risk Register */
+function RiskRegister(){
+  const [risks, setRisks] = React.useState([]);
+  const [showNew, setShowNew] = React.useState(false);
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [probability, setProbability] = React.useState('medium');
+  const [impact, setImpact] = React.useState('medium');
+  const [mitigation, setMitigation] = React.useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!title.trim()) return;
+    const newRisk = {
+      id: 'RISK-'+(2000+risks.length),
+      title,
+      description,
+      probability,
+      impact,
+      mitigation,
+      status: 'open',
+      createdAt: new Date().toISOString()
+    };
+    setRisks([newRisk, ...risks]);
+    setShowNew(false);
+    setTitle('');
+    setDescription('');
+    setProbability('medium');
+    setImpact('medium');
+    setMitigation('');
+  };
+
+  const riskScore = (p, i) => {
+    const scoreMap = {high:3, medium:2, low:1};
+    return scoreMap[p] * scoreMap[i];
+  };
+
+  const scoreColor = (score) => {
+    if(score >= 7) return 'var(--err)';
+    if(score >= 4) return 'var(--warn)';
+    return 'var(--success)';
+  };
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}},
+        React.createElement('h2',{style:{margin:0}},risks.length+' Identified Risks'),
+        React.createElement('button',{onClick:()=>setShowNew(true),className:'btn btn--primary'},'Add Risk')
+      ),
+
+      React.createElement('div',{style:{display:'grid',gap:12}},
+        risks.map(r=>{
+          const score = riskScore(r.probability, r.impact);
+          return React.createElement('div',{key:r.id,className:'card',style:{borderLeft:'4px solid '+scoreColor(score),marginBottom:0}},
+            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'start',marginBottom:12}},
+              React.createElement('div',null,
+                React.createElement('div',{style:{fontSize:13,fontWeight:700}},r.id+' — '+r.title),
+                React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},'Probability: '+r.probability+' · Impact: '+r.impact)
+              ),
+              React.createElement('span',{style:{background:scoreColor(score),color:'white',padding:'4px 10px',borderRadius:3,fontSize:10,fontWeight:600}},
+                'Score: '+score
+              )
+            ),
+            r.description && React.createElement('p',{style:{fontSize:12,color:'var(--ink)',margin:'8px 0'}},r.description),
+            r.mitigation && React.createElement('div',{style:{padding:'8px 12px',background:'rgba(31,138,91,.1)',borderRadius:4,fontSize:12,color:'var(--ink)',marginTop:8}},
+              React.createElement('strong',null,'Mitigation: '),r.mitigation
+            )
+          );
+        })
+      ),
+
+      showNew && React.createElement('div',{className:'modal-overlay',onClick:()=>setShowNew(false)},
+        React.createElement('div',{className:'modal',onClick:(e)=>e.stopPropagation()},
+          React.createElement('div',{className:'modal__head'},
+            React.createElement('h2',null,'Register Risk'),
+            React.createElement('button',{className:'modal__close',onClick:()=>setShowNew(false)},'✕')
+          ),
+          React.createElement('form',{onSubmit:handleSubmit,className:'modal__body'},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Risk Title'),
+              React.createElement('input',{type:'text',placeholder:'e.g., Material Shortage',value:title,onChange:(e)=>setTitle(e.target.value),autoFocus:true})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Description'),
+              React.createElement('textarea',{placeholder:'Describe the risk...',value:description,onChange:(e)=>setDescription(e.target.value),style:{minHeight:80}})
+            ),
+            React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Probability'),
+                React.createElement('select',{value:probability,onChange:(e)=>setProbability(e.target.value)},
+                  React.createElement('option',{value:'low'},'Low'),
+                  React.createElement('option',{value:'medium'},'Medium'),
+                  React.createElement('option',{value:'high'},'High')
+                )
+              ),
+              React.createElement('div',{className:'form-group'},
+                React.createElement('label',null,'Impact'),
+                React.createElement('select',{value:impact,onChange:(e)=>setImpact(e.target.value)},
+                  React.createElement('option',{value:'low'},'Low'),
+                  React.createElement('option',{value:'medium'},'Medium'),
+                  React.createElement('option',{value:'high'},'High')
+                )
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',null,'Mitigation Strategy'),
+              React.createElement('textarea',{placeholder:'How will we mitigate this risk?',value:mitigation,onChange:(e)=>setMitigation(e.target.value),style:{minHeight:80}})
+            ),
+            React.createElement('button',{type:'submit',className:'btn btn--primary',style:{width:'100%'}},'Register Risk')
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{RiskRegister});
+
+/* Log views: RFI, Submittals, Purchasing, Delays */
+function LogShell({title, chips, kpis, children}){
+  return React.createElement('div',{className:'page'},
+    React.createElement('div',{className:'page-head'},
+      React.createElement('div',null,
+        React.createElement('h1',null,title),
+        React.createElement('div',{className:'sub'}, chips.map((c,i)=>
+          React.createElement('span',{key:i,className:'chip'},React.createElement(Icon[c.icon]),c.t)))
+      ),
+      React.createElement('div',{style:{display:'flex',gap:10}},
+        React.createElement('button',{className:'btn btn--ghost'},React.createElement(Icon.download),'Export'),
+        React.createElement('button',{className:'btn btn--primary'},React.createElement(Icon.edit),'New Entry')
+      )
+    ),
+    kpis && React.createElement('div',{className:'grid kpis'}, kpis.map((k,i)=>React.createElement(Kpi,{key:i,...k}))),
+    children
+  );
+}
+
+function TableCard({title,meta,head,rows}){
+  return React.createElement('div',{className:'card tablecard'},
+    React.createElement('div',{className:'card__h'},
+      React.createElement('h3',null,title), meta&&React.createElement('span',{className:'meta'},meta)),
+    React.createElement('table',{className:'tbl'},
+      React.createElement('thead',null,React.createElement('tr',null,
+        head.map((h,i)=>React.createElement('th',{key:i,style:h.w?{width:h.w,textAlign:h.r?'right':'left'}:(h.r?{textAlign:'right'}:null)},h.t||h)))),
+      React.createElement('tbody',null,rows)
+    )
+  );
+}
+
+function RfiLog(){
+  const D=window.DR;
+  const open=D.rfis.filter(r=>r.status==='open').length;
+  const answered=D.rfis.filter(r=>r.status==='answered').length;
+  const closed=D.rfis.filter(r=>r.status==='closed').length;
+  const high=D.rfis.filter(r=>r.status==='open'&&r.pr==='high').length;
+  return React.createElement(LogShell,{title:'RFI Log',
+    chips:[{icon:'help',t:D.rfis.length+' total · '+open+' open'},{icon:'clock',t:'Buyout-phase clarifications'}],
+    kpis:[
+      {label:'Open',val:String(open),sub:high+' high priority',icon:'help',tone:'red'},
+      {label:'Answered',val:String(answered),sub:'awaiting closeout',icon:'check',tone:'green'},
+      {label:'Closed',val:String(closed),sub:'this project',icon:'check',tone:'navy'},
+      {label:'Total',val:String(D.rfis.length),sub:'Longleaf Amenity',icon:'doc',tone:'cyan'},
+    ]},
+    React.createElement(TableCard,{title:'All Requests for Information',meta:'Sorted by date',
+      head:[{t:'RFI #',w:90},'Subject','Discipline','Ball in Court','Opened','Due',{t:'Priority',w:100},{t:'Status',w:110}],
+      rows:D.rfis.map(r=>React.createElement('tr',{key:r.id},
+        React.createElement('td',{className:'code'},r.id),
+        React.createElement('td',{className:'strong'},r.subj),
+        React.createElement('td',null,r.disc),
+        React.createElement('td',null,r.to),
+        React.createElement('td',null,r.opened),
+        React.createElement('td',null,r.due),
+        React.createElement('td',null,React.createElement(PriPill,{pr:r.pr})),
+        React.createElement('td',null,React.createElement(Pill,{status:r.status}))
+      ))
+    })
+  );
+}
+
+function SubmittalLog(){
+  const D=window.DR;
+  const review=D.submittals.filter(s=>s.status==='review').length;
+  const approved=D.submittals.filter(s=>s.status==='approved').length;
+  const rejected=D.submittals.filter(s=>s.status==='rejected').length;
+  return React.createElement(LogShell,{title:'Submittal Log',
+    chips:[{icon:'inbox',t:D.submittals.length+' total · '+review+' in review'},{icon:'layers',t:'By spec section'}],
+    kpis:[
+      {label:'In Review',val:String(review),sub:'with A/E team',icon:'inbox',tone:'amber'},
+      {label:'Approved',val:String(approved),sub:'released to procure',icon:'check',tone:'green'},
+      {label:'Rejected',val:String(rejected),sub:rejected?'resubmit required':'none',icon:'alert',tone:'red'},
+      {label:'Total',val:String(D.submittals.length),sub:'Longleaf Amenity',icon:'doc',tone:'navy'},
+    ]},
+    React.createElement(TableCard,{title:'All Submittals',meta:'Sorted by date received',
+      head:[{t:'Sub #',w:90},'Item','Spec Section','Ball in Court','Received',{t:'Rev',w:60},{t:'Status',w:120}],
+      rows:D.submittals.map(s=>React.createElement('tr',{key:s.id},
+        React.createElement('td',{className:'code'},s.id),
+        React.createElement('td',{className:'strong'},s.subj),
+        React.createElement('td',null,s.spec),
+        React.createElement('td',null,s.ball),
+        React.createElement('td',null,s.received),
+        React.createElement('td',{className:'tnum'},'R'+s.rev),
+        React.createElement('td',null,React.createElement(Pill,{status:s.status}))
+      ))
+    })
+  );
+}
+
+function Purchasing(){
+  const D=window.DR;
+  const tot=D.purchasing.reduce((a,p)=>a+p.amt,0);
+  return React.createElement(LogShell,{title:'Purchasing & Procurement',
+    chips:[{icon:'cart',t:D.purchasing.length+' active POs'},{icon:'truck',t:'2 in transit to Abaco'}],
+    kpis:[
+      {label:'Open POs',val:'6',sub:D.usdK(tot)+' value',icon:'cart',tone:'cyan'},
+      {label:'In Transit',val:'2',sub:'barge to Guana Cay',icon:'truck',tone:'amber'},
+      {label:'Received',val:'1',sub:'this month',icon:'check',tone:'green'},
+      {label:'Long-Lead Items',val:'3',sub:'glass · VRF · gen',icon:'clock',tone:'navy'},
+    ]},
+    React.createElement(TableCard,{title:'Purchase Orders',meta:'Total committed '+D.usd(tot),
+      head:[{t:'PO #',w:90},'Vendor',{t:'Div',w:80},'Description',{t:'Amount',w:120,r:true},{t:'Status',w:110},'Issued'],
+      rows:D.purchasing.map(p=>React.createElement('tr',{key:p.po},
+        React.createElement('td',{className:'code'},p.po),
+        React.createElement('td',{className:'strong'},p.vendor),
+        React.createElement('td',{className:'code',style:{fontSize:11.5}},p.div),
+        React.createElement('td',null,p.desc),
+        React.createElement('td',{className:'num'},D.usd(p.amt)),
+        React.createElement('td',null,React.createElement(Pill,{status:p.status})),
+        React.createElement('td',null,p.date)
+      ))
+    })
+  );
+}
+
+function Delays(){
+  const D=window.DR;
+  const tot=D.delays.reduce((a,d)=>a+d.days,0);
+  const causeTone={Weather:'cyan',Procurement:'amber',Logistics:'navy',Labor:'red',Owner:'green'};
+  return React.createElement(LogShell,{title:'Schedule Delays',
+    chips:[{icon:'clock',t:tot+' total delay days'},{icon:'flag',t:D.delays.length+' logged events'}],
+    kpis:[
+      {label:'Total Delay',val:tot+'d',sub:'vs. baseline',icon:'clock',tone:'red'},
+      {label:'Weather',val:'9d',sub:'1 event',icon:'alert',tone:'cyan'},
+      {label:'Procurement',val:'6d',sub:'1 event',icon:'truck',tone:'amber'},
+      {label:'Recoverable',val:'5d',sub:'forecast pull-back',icon:'trend',tone:'green'},
+    ]},
+    React.createElement(TableCard,{title:'Delay Events',meta:'Impact to critical path',
+      head:['Event',{t:'Cause',w:130},{t:'Days',w:80,r:true},'Affected Milestone',{t:'Period',w:110}],
+      rows:D.delays.map((d,i)=>React.createElement('tr',{key:i},
+        React.createElement('td',{className:'strong'},d.evt),
+        React.createElement('td',null,React.createElement('span',{className:'pill pill--'+(causeTone[d.cause]==='red'?'bad':causeTone[d.cause]==='amber'?'warn':causeTone[d.cause]==='green'?'ok':'idle')},d.cause)),
+        React.createElement('td',{className:'num'},'+'+d.days),
+        React.createElement('td',null,d.ms),
+        React.createElement('td',null,d.date)
+      ))
+    })
+  );
+}
+
+Object.assign(window,{RfiLog,SubmittalLog,Purchasing,Delays});
+
+/* Longleaf Amenity Bids Tracker */
+
+function BidsTracker(){
+  const P = window.PROJECT;
+  const returned = P.bids.filter(b=>b.status==='Done');
+  const pending = P.bids.filter(b=>b.status==='Not Returned');
+
+  const kpiRow = (label,val,sub,tone)=>React.createElement('div',{className:'kpi'+' kpi--'+tone},
+    React.createElement('div',{className:'kpi__label'},label),
+    React.createElement('div',{className:'kpi__val'},val),
+    sub && React.createElement('div',{className:'kpi__sub'},sub)
+  );
+
+  return React.createElement('div',{className:'view'},
+    React.createElement('div',{className:'pg-grid'},
+      React.createElement('div',{className:'pg-row'},
+        kpiRow('Total Bids Value', P.usd(P.total), P.bids.length+' vendors', 'gold'),
+        kpiRow('Returned', P.returned, 'of '+P.bids.length, 'cyan'),
+        kpiRow('Not Returned', P.notReturned, 'pending', 'warn'),
+        kpiRow('Completion', Math.round(P.returned/P.bids.length*100)+'%', 'bids in', 'cyan')
+      ),
+      React.createElement('div',{className:'pg-row cols-2',style:{marginTop:20}},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card__h'},
+            React.createElement('h3',null,'Returned Bids'),
+            React.createElement('span',{className:'card__badge'},P.returned+' vendors')
+          ),
+          React.createElement('div',{className:'tbl-wrap'},
+            React.createElement('table',{className:'tbl'},
+              React.createElement('thead',null,
+                React.createElement('tr',null,
+                  React.createElement('th',{style:{width:50}},'ID'),
+                  React.createElement('th',null,'Vendor'),
+                  React.createElement('th',null,'Trade'),
+                  React.createElement('th',{style:{textAlign:'right',width:120}},'Amount')
+                )
+              ),
+              React.createElement('tbody',null,
+                returned.map(b=>React.createElement('tr',{key:b.id},
+                  React.createElement('td',{className:'code'},b.id),
+                  React.createElement('td',{className:'vendor'},b.vendor),
+                  React.createElement('td',{style:{color:'var(--ds-dim)',fontSize:12}},b.trade),
+                  React.createElement('td',{className:'num'},P.usd(b.amt))
+                ))
+              )
+            )
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card__h'},
+            React.createElement('h3',null,'Pending Response'),
+            React.createElement('span',{className:'card__badge'},P.notReturned+' vendors')
+          ),
+          React.createElement('div',{className:'tbl-wrap'},
+            React.createElement('table',{className:'tbl'},
+              React.createElement('thead',null,
+                React.createElement('tr',null,
+                  React.createElement('th',{style:{width:50}},'ID'),
+                  React.createElement('th',null,'Vendor'),
+                  React.createElement('th',null,'Trade'),
+                  React.createElement('th',{style:{width:100}},'Action')
+                )
+              ),
+              React.createElement('tbody',null,
+                pending.map(b=>React.createElement('tr',{key:b.id},
+                  React.createElement('td',{className:'code'},b.id),
+                  React.createElement('td',{className:'vendor'},b.vendor),
+                  React.createElement('td',{style:{color:'var(--ds-dim)',fontSize:12}},b.trade),
+                  React.createElement('td',null,React.createElement('button',{className:'btn btn--sm'},'Send'))
+                ))
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+Object.assign(window,{BidsTracker});
+
+/* App root */
+function App(){
+  const user = window.AUTH.getUser();
+  const [showAdmin, setShowAdmin] = React.useState(false);
+  
+  // Not logged in: show login screen
+  if(!user) return React.createElement(LoginScreen);
+
+  const [active,setActive]=React.useState(()=>{
+    const saved = localStorage.getItem('dr_view') || 'dashboard';
+    return window.AUTH.canView(saved) ? saved : 'dashboard';
+  });
+  const main=React.useRef(null);
+  
+  const go=(id)=>{
+    if(!window.AUTH.canView(id)){
+      alert('You do not have access to this section.');
+      return;
+    }
+    setActive(id);
+    localStorage.setItem('dr_view',id);
+    window.AUTH.log('VIEW', id, id);
+    if(main.current) main.current.scrollTop=0;
+  };
+  React.useEffect(()=>{ window.__go = go; window.__setView = setActive; }, []);
+
+  const View = {
+    dashboard:Dashboard, schedule:Schedule, gantt:GanttChart, budget:Budget,
+    documents:DocumentManager, daily:DailyReports, issues:IssueTracker, safety:SafetyLog, changeorders:ChangeOrderTracker, invoices:InvoiceManager, equipment:EquipmentTracking, forecasting:CostForecasting, risks:RiskRegister,
+    rfi:RfiLog, submittals:SubmittalLog, bids:BidsTracker
+  }[active] || Dashboard;
+
+  return React.createElement(React.Fragment,null,
+    React.createElement('div',{className:'app'},
+      React.createElement(Sidebar,{active,go,user}),
+      React.createElement('div',{className:'main',ref:main},
+        React.createElement(Topbar,{active,user,showAdmin,setShowAdmin}),
+        React.createElement(View,{key:active})
+      )
+    ),
+    showAdmin && React.createElement(AdminInvitePanel,{onClose:()=>setShowAdmin(false)})
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+
+  </script>
+</body>
+</html>

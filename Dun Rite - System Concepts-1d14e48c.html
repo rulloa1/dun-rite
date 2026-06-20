@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dun Rite — System Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Expanded:wght@700;800&family=Public+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#EDEEF0;font-family:'Public Sans',system-ui,sans-serif}
+  *{box-sizing:border-box}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="concepts-shared.jsx"></script>
+<script type="text/babel" src="concept-a.jsx"></script>
+<script type="text/babel" src="concept-b.jsx"></script>
+<script type="text/babel" src="concept-c.jsx"></script>
+<script type="text/babel" src="concept-d.jsx"></script>
+<script type="text/babel">
+const {useState} = React;
+
+function Frame({children, h=680}){
+  // fixed-size dashboard frame
+  return <div style={{width:1100,height:h,background:'#fff',overflow:'hidden'}}>{children}</div>;
+}
+
+function App(){
+  return (
+    <DesignCanvas>
+      <DCSection id="concepts" title="Dun Rite Operating System — Dashboard Concepts"
+        subtitle="Three takes on the home screen. Same data, same brand, same login — different organizing idea. React and I'll build the winner out end-to-end.">
+        <DCArtboard id="a" label="A · Portfolio Command Center" width={1100} height={680}>
+          <Frame><ConceptA/></Frame>
+        </DCArtboard>
+        <DCArtboard id="b" label="B · My Work (personal home)" width={1100} height={680}>
+          <Frame><ConceptB/></Frame>
+        </DCArtboard>
+        <DCArtboard id="c" label="C · Pipeline Board (lead → closeout)" width={1100} height={680}>
+          <Frame><ConceptC/></Frame>
+        </DCArtboard>
+      </DCSection>
+      <DCSection id="automation" title="Automation layer — fewer steps, not more"
+        subtitle="Whichever home screen we pick, this runs underneath it. Every row is a handoff the system does on its own, and the manual step it removes. Nothing new for the crew to learn.">
+        <DCArtboard id="d" label="D · Automations (what runs by itself)" width={1100} height={720}>
+          <Frame h={720}><ConceptD/></Frame>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

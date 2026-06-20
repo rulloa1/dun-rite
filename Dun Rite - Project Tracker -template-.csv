@@ -1,0 +1,12 @@
+Type,Code,Name,Stage,Phase,Percent,Contract,Spent,Due,PM,Super,Health,Task,Owner,Done,Division,Item,Amount
+project,LON,Longleaf Amenity Center,Active,Drywall,65,1610000,1420000,Aug 14,Sarah Johnson,Mike Torres,On Track,,,,,,
+project,RVO,Riverview Office Buildout,Active,MEP Rough-In,41,866000,612000,Sep 02,Sarah Johnson,Mike Torres,Watch,,,,,,
+project,MAP,Maple St. Renovation,Active,Demo,24,260000,278000,Jul 22,Mike Torres,Mike Torres,At Risk,,,,,,
+project,CED,Cedar Park Clubhouse,Punch,Punch List,91,2140000,2050000,Jun 30,Sarah Johnson,Mike Torres,On Track,,,,,,
+project,HBR,Harbor View Townhomes,Active,Slab,12,2400000,190000,Mar 15,Mike Torres,Mike Torres,On Track,,,,,,
+task,LON,,,,,,,Jun 20,,,,Confirm drywall delivery,Mike Torres,No,,,
+task,LON,,,,,,,Jun 24,,,,Order cabinet hardware,Mike Torres,No,,,
+task,RVO,,,,,,,Jun 19,,,,Walk MEP rough-in w/ inspector,Mike Torres,No,,,
+budget,LON,,,,,,,,,,,,,,03 Concrete,Structural Concrete,30000
+budget,LON,,,,,,,,,,,,,,13 Special Construction,Swimming Pool,477938
+budget,LON,,,,,,,,,,,,,,16 Electrical,Electrical Sub,52992

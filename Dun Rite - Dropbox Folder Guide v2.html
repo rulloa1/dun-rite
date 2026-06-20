@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DunRite — Dropbox Folder Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Expanded:wght@600;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-cyan:#1DB4E8;
+  --brand-blue:#1583C7;
+  --navy:#142130;
+  --navy-deep:#0E1A28;
+  --ink:#16212E;
+  --ink-2:#3C4A5A;
+  --muted:#6A7889;
+  --faint:#9AA7B4;
+  --line:#E4E9EE;
+  --line-soft:#EEF2F6;
+  --paper:#F4F7FA;
+  --card:#FFFFFF;
+  --ok:#1E9E6A;
+  --r:12px; --r-lg:18px;
+  --font-display:'Archivo Expanded','Archivo',sans-serif;
+  --font-body:'Public Sans',system-ui,sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding:32px 20px;
+  display:flex;
+  justify-content:center;
+}
+.page{
+  width:8.5in;
+  min-height:11in;
+  background:var(--card);
+  box-shadow:0 18px 48px rgba(13,30,48,.14);
+  border-radius:6px;
+  overflow:hidden;
+}
+
+/* Header */
+.head{
+  background:linear-gradient(135deg,var(--navy-deep),var(--navy) 70%);
+  color:#fff;
+  padding:30px 44px 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.head__mark{display:flex;align-items:center;gap:16px}
+.logo{
+  width:48px;height:48px;border-radius:11px;
+  background:var(--brand-cyan);
+  display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:800;font-size:26px;color:#fff;
+  box-shadow:0 6px 18px rgba(29,180,232,.4);
+}
+.head h1{
+  font-family:var(--font-display);font-weight:800;
+  font-size:23px;letter-spacing:-.01em;line-height:1.05;
+}
+.head .sub{font-size:12px;color:#9FB3C6;letter-spacing:.04em;margin-top:3px;text-transform:uppercase;font-weight:600}
+.head__tag{
+  text-align:right;font-size:11px;color:#8AA0B5;line-height:1.5;
+}
+.head__tag b{color:var(--brand-cyan);font-weight:700;display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+
+.body{padding:32px 44px 40px}
+
+.intro{
+  font-size:13.5px;color:var(--ink-2);line-height:1.6;
+  max-width:62ch;margin-bottom:26px;
+}
+.intro b{color:var(--ink)}
+
+/* Section labels */
+.sect-label{
+  font-family:var(--font-display);font-weight:700;
+  font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--navy);
+  display:flex;align-items:center;gap:10px;
+  margin:0 0 14px;
+}
+.sect-label::before{
+  content:"";width:22px;height:3px;background:var(--brand-cyan);border-radius:2px;
+}
+
+.cols{display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:start}
+
+/* Folder tree */
+.tree{
+  font-family:var(--font-mono);font-size:12px;line-height:1.85;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:18px 20px;
+}
+.tree .row{display:flex;align-items:baseline;white-space:nowrap}
+.tree .fold{color:var(--navy);font-weight:500}
+.tree .root{color:var(--brand-blue);font-weight:500}
+.tree .ind{color:var(--faint)}
+.tree .note{color:var(--muted);font-family:var(--font-body);font-size:10.5px;margin-left:8px;font-style:italic}
+.tree .l2{padding-left:18px}
+.tree .l3{padding-left:36px}
+.tree .dot{font-size:11px;margin-right:7px}
+.tree .dot.ok{color:var(--ok)}
+.tree .dot.active{color:var(--brand-blue)}
+.tree .dot.next{color:var(--faint)}
+
+/* Convention cards */
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:15px 17px;
+  margin-bottom:13px;
+}
+.card h3{
+  font-size:12.5px;font-weight:700;color:var(--navy);
+  display:flex;align-items:center;gap:8px;margin-bottom:7px;
+}
+.card h3 .n{
+  width:19px;height:19px;border-radius:5px;background:var(--brand-cyan);color:#fff;
+  display:grid;place-items:center;font-size:11px;font-weight:800;flex:none;
+}
+.card p{font-size:12px;color:var(--ink-2);line-height:1.5}
+.card code{
+  font-family:var(--font-mono);font-size:11px;
+  background:#fff;border:1px solid var(--line);border-radius:5px;
+  padding:1px 6px;color:var(--brand-blue);font-weight:500;
+  white-space:nowrap;
+}
+
+/* Naming example strip */
+.naming{
+  margin-top:30px;
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.naming__head{
+  background:var(--navy);color:#fff;padding:11px 20px;
+  font-family:var(--font-display);font-weight:700;font-size:12.5px;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+.naming__grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.ncell{padding:15px 20px}
+.ncell:first-child{border-right:1px solid var(--line)}
+.ncell .lab{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.ex{display:flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:12px;margin-bottom:7px;color:var(--ink)}
+.ex:last-child{margin-bottom:0}
+.tick{color:var(--ok);font-weight:700;flex:none}
+.cross{color:#E0524B;font-weight:700;flex:none}
+.ex.bad{color:var(--faint);text-decoration:line-through}
+
+/* Footer */
+.foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:10.5px;color:var(--faint);
+}
+.foot b{color:var(--muted);font-weight:600}
+
+@media print{
+  body{padding:0;background:#fff}
+  .page{box-shadow:none;border-radius:0;width:100%;min-height:0}
+  @page{size:letter;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="head">
+    <div class="head__mark">
+      <div class="logo">DC</div>
+      <div>
+        <h1>Longleaf Amenity — File Structure</h1>
+        <div class="sub">Phase-Based Folders · Mapped to the Schedule</div>
+      </div>
+    </div>
+    <div class="head__tag">
+      <b>DunRite</b>
+      Construction Group LLC<br>
+      Rev. 2026.06
+    </div>
+  </header>
+
+  <div class="body">
+    <p class="intro">
+      Folders follow the <b>build sequence</b> from the project Gantt — slab to closeout — so the file
+      structure matches how the job actually runs. Status dots mirror the schedule:
+      <span style="color:var(--ok);font-weight:700">●</span> done ·
+      <span style="color:var(--brand-blue);font-weight:700">●</span> in progress ·
+      <span style="color:var(--faint);font-weight:700">●</span> upcoming.
+    </p>
+
+    <div class="cols">
+      <div>
+        <div class="sect-label">Phase Folders</div>
+        <div class="tree">
+          <div class="row"><span class="root">📁 2026_LongleafAmenity/</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="fold">00_Project Admin</span><span class="note">contracts · permits · insurance</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot ok">●</span><span class="fold">01_Pour Slab</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot ok">●</span><span class="fold">02_Flashing &amp; Dry-In</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot ok">●</span><span class="fold">03_MEPS Rough-In</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot active">●</span><span class="fold">04_Drywall</span><span class="note">in progress</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot next">●</span><span class="fold">05_Cabinets</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot next">●</span><span class="fold">06_Countertops</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot next">●</span><span class="fold">07_MEP Trim</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot next">●</span><span class="fold">08_Exterior Finishes</span></div>
+          <div class="row l2"><span class="ind">├─ </span><span class="dot next">●</span><span class="fold">09_House Complete</span><span class="note">closeout · punch list</span></div>
+          <div class="row l2"><span class="ind">└─ </span><span class="fold">_Photos</span><span class="note">all-phase progress photos</span></div>
+        </div>
+        <p class="intro" style="margin-top:14px;margin-bottom:0;font-size:12px">
+          Inside <b>every</b> phase folder, keep the same four: <code>Contracts</code>,
+          <code>RFIs &amp; Submittals</code>, <code>Change Orders</code>, <code>Daily Logs</code>.
+          Same layout in each phase — so you always know where a doc lives.
+        </p>
+      </div>
+
+      <div>
+        <div class="sect-label">Why It Works</div>
+        <div class="card">
+          <h3><span class="n">1</span>Folders = the schedule</h3>
+          <p>Phases match the Gantt, so files land where the work is and the order never shifts.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">2</span>Same four in every phase</h3>
+          <p>Contracts · RFIs · Change Orders · Daily Logs — identical inside each phase folder.</p>
+        </div>
+        <div class="card">
+          <h3><span class="n">3</span>Date files inside-out</h3>
+          <p>Lead with <code>YYYY-MM-DD</code> so files auto-sort by date within a folder.</p>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="n">4</span>Photos stay together</h3>
+          <p>One <code>_Photos</code> folder for all phases — easier to scan progress over time.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="naming">
+      <div class="naming__head">Naming Conventions — Do This</div>
+      <div class="naming__grid">
+        <div class="ncell">
+          <div class="lab">Phase Folders</div>
+          <div class="ex"><span class="tick">✓</span> 04_Drywall</div>
+          <div class="ex"><span class="tick">✓</span> 05_Cabinets</div>
+          <div class="ex bad"><span class="cross">✕</span> drywall stuff</div>
+          <div class="ex bad"><span class="cross">✕</span> cabinets NEW</div>
+        </div>
+        <div class="ncell">
+          <div class="lab">Files Inside Folders</div>
+          <div class="ex"><span class="tick">✓</span> 2026-06-18_ChangeOrder-03.pdf</div>
+          <div class="ex"><span class="tick">✓</span> 2026-06-10_DailyLog.pdf</div>
+          <div class="ex bad"><span class="cross">✕</span> scan_001.pdf</div>
+          <div class="ex bad"><span class="cross">✕</span> CO final final.pdf</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>Folders track the <b>Longleaf Amenity</b> Gantt — currently in the Drywall phase.</span>
+      <span><b>DunRite Construction Group LLC</b></span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
