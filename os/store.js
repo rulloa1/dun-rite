@@ -851,6 +851,62 @@
       return n ? `${n} invoice${n!==1?'s':''} synced to QuickBooks` : 'All invoices already synced';
     },
 
+
+    /* ---- Project CRUD ---- */
+    addProject(data, user) {
+      const DEF = {tasks:[],logs:[],cos:[],photos:[],docs:[],issues:[],gallery:[]};
+      const p = Object.assign({}, DEF, {
+        id:   data.id   || 'proj-' + Date.now(),
+        name: data.name || 'Untitled Project',
+        stage: data.stage || data.status || 'Active',
+        status: data.status || 'active',
+        pm:    data.pm || data.manager || '—',
+        manager: data.manager || data.pm || '—',
+        super: data.super || '—',
+        phase: data.phase || '',
+        pct:   data.pct   || 0,
+        contract: data.contract || data.budget || 0,
+        budget:   data.budget   || data.contract || 0,
+        spent: data.spent || 0,
+        due:   data.due   || data.completionDate || '—',
+        health: data.health || 'ok',
+        location: data.location || '',
+        client: data.client || '',
+        projectNumber: data.projectNumber || '',
+        startDate: data.startDate || '',
+        completionDate: data.completionDate || '',
+        description: data.description || '',
+        createdAt: data.createdAt || new Date().toISOString(),
+      });
+      state.projects.push(p);
+      if(user) logActivity(user.initials, 'Created project', p.name);
+      emit();
+      return p;
+    },
+
+    updateProject(pid, data, user) {
+      const p = P(pid); if(!p) return;
+      if(data.budget    != null) data.contract = data.budget;
+      if(data.contract  != null) data.budget   = data.contract;
+      if(data.manager   != null) data.pm       = data.manager;
+      if(data.pm        != null) data.manager  = data.pm;
+      if(data.status    != null) data.stage    = data.status;
+      if(data.stage     != null) data.status   = data.stage;
+      if(data.completionDate != null) data.due = data.completionDate;
+      Object.assign(p, data);
+      if(user) logActivity(user.initials, 'Updated project', p.name);
+      emit();
+      return p;
+    },
+
+    deleteProject(pid, user) {
+      const i = state.projects.findIndex(x=>x.id===pid); if(i<0) return;
+      const name = state.projects[i].name;
+      state.projects.splice(i, 1);
+      if(user) logActivity(user.initials||'—', 'Deleted project', name);
+      emit();
+    },
+
     reset(){ state=seed(); emit(); },
   };
 
