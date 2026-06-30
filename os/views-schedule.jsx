@@ -60,7 +60,8 @@ const SCHEDULES = {
 function ScheduleView(){
   const t=DRtok; const {state}=useStore();
   const sched=state.projects.filter(p=>SCHEDULES[p.id]);
-  const [pid,setPid]=useStateS((sched[0]||{}).id);
+  const [pid,setPid]=useStateS(()=>{ const ap=localStorage.getItem('dr_active_project'); return (ap && sched.find(p=>p.id===ap)) ? ap : (sched[0]||{}).id; });
+  useEffectS(()=>{ const onStorageSched=e=>{ if(e.key==='dr_active_project' && e.newValue){ const ap=e.newValue; if(sched.find(p=>p.id===ap)) setPid(ap); } }; window.addEventListener('storage',onStorageSched); return ()=>window.removeEventListener('storage',onStorageSched); },[]);
   const p=DROS.P(pid)||sched[0];
   const tmpl=SCHEDULES[pid]||SCHEDULES[sched[0]?.id];
   const ov=(state.scheduleOverrides||{})[pid]||{};

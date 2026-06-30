@@ -2,7 +2,7 @@
    signature workflow (draft → out for signature → executed) and
    invoiced-to-date. Vendors come from the Directory; executed value
    rolls into the budget picture. Wired to DROS.actions. */
-const {useState:useStateCm} = React;
+const {useState:useStateCm, useEffect:useEffectCm} = React;
 
 const cmStatus = {
   draft:    ['Draft',         'idle'],
@@ -16,7 +16,8 @@ function CommitmentsView({user}){
   const projects=state.projects.filter(p=>!['Lead','Bidding'].includes(p.stage));
   const vendors=(state.directory||[]).filter(c=>c.status==='active' && ['Subcontractor','Vendor'].includes(c.type));
 
-  const [pid,setPid]=useStateCm('all');
+  const [pid,setPid]=useStateCm(()=>localStorage.getItem('dr_active_project')||'all');
+  useEffectCm(()=>{ const onStorageCm=e=>{ if(e.key==='dr_active_project') setPid(e.newValue||'all'); }; window.addEventListener('storage',onStorageCm); return ()=>window.removeEventListener('storage',onStorageCm); },[]);
   const [type,setType]=useStateCm('all');
   const [f,setF]=useStateCm({type:'sub',pid:(projects[0]||{}).id,vendorId:(vendors[0]||{}).id||'',title:'',costCode:'',amount:''});
 

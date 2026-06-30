@@ -1,7 +1,7 @@
 /* Budget — portfolio rollup + real Schedule of Values for Longleaf,
    loaded line-for-line from the uploaded contract budget ($1,350,000).
    Loaded AFTER views-project.jsx so this BudgetView wins. */
-const {useState:useStateB} = React;
+const {useState:useStateB, useEffect:useEffectB} = React;
 
 /* Longleaf Amenity Center — real CSI cost breakdown from contract */
 const SOV = {
@@ -64,7 +64,8 @@ function BudgetView(){
   const rows=state.projects.filter(p=>['Active','Punch'].includes(p.stage));
   const contract=rows.reduce((s,p)=>s+p.contract,0), spent=rows.reduce((s,p)=>s+p.spent,0);
   const withSOV=state.projects.filter(p=>SOV[p.id]);
-  const [pid,setPid]=useStateB((withSOV[0]||{}).id);
+  const [pid,setPid]=useStateB(()=>{ const ap=localStorage.getItem('dr_active_project'); return (ap && withSOV.find(p=>p.id===ap)) ? ap : (withSOV[0]||{}).id; });
+  useEffectB(()=>{ const onStorage=e=>{ if(e.key==='dr_active_project' && e.newValue){ const ap=e.newValue; if(withSOV.find(p=>p.id===ap)) setPid(ap); } }; window.addEventListener('storage',onStorage); return ()=>window.removeEventListener('storage',onStorage); },[]);
   const groups=SOV[pid]||[]; const total=sovTotal(pid);
 
   return (
