@@ -64,6 +64,16 @@ window.DRQuickBooks = (function(){
   function markSynced(n){ info.synced=(info.synced||0)+(n||0); persist(); emit(); }
   function openUrl(){ return info.url || 'https://qbo.intuit.com'; }
 
+
+  /* Listen for the token-exchange Cloud Function's popup postMessage.
+     When the /qbo-callback page posts { qbo:'ok', company, realmId }
+     we call connect() so the sidebar badge and sync all update. */
+  window.addEventListener('message', function(event){
+    if (!event.data || event.data.qbo !== 'ok') return;
+    const d = event.data;
+    connect({ company: d.company || 'QuickBooks Online', realm: d.realmId || '' });
+  });
+
   load();
   setTimeout(emit, 300);
   return { connect, disconnect, connectOAuth, onStatus, openUrl, canOAuth, markSynced,
