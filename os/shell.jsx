@@ -363,9 +363,9 @@ function Login({onPick}){
 }
 
 /* ---- nav config ---- */
-const NAV_MAIN_R=[{id:'home',label:'Home',icon:IC.grid},{id:'pipeline',label:'Pipeline',icon:IC.flag},{id:'bidding',label:'Bidding',icon:IC.inbox},{id:'schedule',label:'Schedule',icon:IC.calendar},{id:'budget',label:'Budget',icon:IC.wallet},{id:'commitments',label:'Commitments',icon:IC.doc},{id:'directory',label:'Directory',icon:IC.user},{id:'automations',label:'Automations',icon:IC.bolt}];
+const NAV_MAIN_R=[{id:'home',label:'Home',icon:IC.grid},{id:'projects',label:'Projects',icon:IC.building},{id:'pipeline',label:'Pipeline',icon:IC.flag},{id:'bidding',label:'Bidding',icon:IC.inbox},{id:'schedule',label:'Schedule',icon:IC.calendar},{id:'budget',label:'Budget',icon:IC.wallet},{id:'commitments',label:'Commitments',icon:IC.doc},{id:'directory',label:'Directory',icon:IC.user},{id:'automations',label:'Automations',icon:IC.bolt}];
 const NAV_LOGS_R=[{id:'documents',label:'Documents',icon:IC.doc},{id:'daily',label:'Daily Reports',icon:IC.clipboard},{id:'meetings',label:'Meetings',icon:IC.list},{id:'inspections',label:'Inspections',icon:IC.check},{id:'issues',label:'Issues',icon:IC.alert},{id:'safety',label:'Safety',icon:IC.alert},{id:'insurance',label:'Insurance',icon:IC.flag},{id:'changeorders',label:'Change Orders',icon:IC.edit},{id:'invoices',label:'Invoices',icon:IC.receipt},{id:'rfi',label:'RFI Log',icon:IC.help,badge:'3'},{id:'submittals',label:'Submittals',icon:IC.inbox,badge:'4'}];
-const LIVE=new Set(['home','advisor','pipeline','bidding','schedule','budget','commitments','directory','automations','project','documents','meetings','inspections','insurance','issues','invoices','changeorders','daily','rfi','submittals','safety','equipment']);
+const LIVE=new Set(['home','advisor','projects','pipeline','bidding','schedule','budget','commitments','directory','automations','project','documents','meetings','inspections','insurance','issues','invoices','changeorders','daily','rfi','submittals','safety','equipment']);
 
 function ShellNavRow({label,icon,on,badge,dim,onClick}){
   const t=DRtok;
@@ -376,7 +376,7 @@ function ShellNavRow({label,icon,on,badge,dim,onClick}){
   </button>;
 }
 
-const TITLES_R={home:'Home',advisor:'Profit Advisor',pipeline:'Pipeline',bidding:'Bidding',schedule:'Schedule',budget:'Budget & Cost',commitments:'Commitments',directory:'Directory',automations:'Automations',project:'Project',documents:'Documents',meetings:'Meetings',inspections:'Inspections',issues:'Issues & Punch List',invoices:'Invoices',changeorders:'Change Orders',daily:'Daily Reports',rfi:'RFI Log',submittals:'Submittals',safety:'Safety Log',insurance:'Subcontractor Insurance',equipment:'Equipment'};
+const TITLES_R={home:'Home',advisor:'Profit Advisor',projects:'Projects',pipeline:'Pipeline',bidding:'Bidding',schedule:'Schedule',budget:'Budget & Cost',commitments:'Commitments',directory:'Directory',automations:'Automations',project:'Project',documents:'Documents',meetings:'Meetings',inspections:'Inspections',issues:'Issues & Punch List',invoices:'Invoices',changeorders:'Change Orders',daily:'Daily Reports',rfi:'RFI Log',submittals:'Submittals',safety:'Safety Log',insurance:'Subcontractor Insurance',equipment:'Equipment'};
 
 /* ============================================================
    Expressive theme layer (Tweaks). Mutates the shared DRtok tokens
@@ -421,6 +421,7 @@ function ensureFont(tw){
 const VIEW_ART = {
   home:        {photo:true},
   advisor:     {icon:IC.trend},
+  projects:    {icon:IC.building},
   pipeline:    {icon:IC.flag},
   schedule:    {icon:IC.calendar},
   budget:      {icon:IC.wallet},
@@ -468,6 +469,8 @@ function AppShell({user,route,go,onLogout,theme}){
   const curId=route.view;
   const Sect=({children})=><div style={{fontSize:11,letterSpacing:'.14em',textTransform:'uppercase',color:'#5C6E80',fontWeight:700,padding:'18px 10px 8px'}}>{children}</div>;
   const crumbTitle=route.view==='project'?(DROS.P(route.pid)?.name||'Project'):(TITLES_R[route.view]||'Home');
+  const _activePid=localStorage.getItem('dr_active_project');
+  const _activeProj=_activePid?DROS.P(_activePid):null;
   return (
     <div style={{display:'grid',gridTemplateColumns:'264px 1fr',height:'100vh',fontFamily:t.fBody,color:t.ink,background:t.paper,overflow:'hidden'}}>
       <aside style={{background:`linear-gradient(180deg,${t.navyDeep},#0A1420)`,display:'flex',flexDirection:'column',borderRight:'1px solid rgba(255,255,255,.05)',overflow:'hidden'}}>
@@ -492,6 +495,12 @@ function AppShell({user,route,go,onLogout,theme}){
         <Backdrop mode={theme&&theme.backdrop} view={route.view}/>
         <div style={{height:68,display:'flex',alignItems:'center',gap:8,padding:'0 22px',background:'rgba(244,247,250,.92)',borderBottom:`1px solid ${t.line}`,flex:'none',position:'relative',zIndex:1}}>
           <div style={{display:'flex',alignItems:'center',gap:9,color:t.muted,fontSize:13.5,fontWeight:500,flex:'none',minWidth:0,whiteSpace:'nowrap'}}><DIcon d={IC.building} s={15} style={{color:t.faint}}/><span>DunRite</span><DIcon d={IC.chevron} s={15} style={{color:t.faint}}/><b style={{color:t.ink,fontWeight:700,overflow:'hidden',textOverflow:'ellipsis'}}>{crumbTitle}</b></div>
+          {_activeProj && (
+            <button onClick={()=>go({view:'projects'})} title="Switch active project" style={{display:'inline-flex',alignItems:'center',gap:6,height:34,padding:'0 10px',borderRadius:8,background:`rgba(29,180,232,.12)`,color:t.cyan,fontSize:12,fontWeight:700,border:`1px solid rgba(29,180,232,.22)`,cursor:'pointer',maxWidth:220,overflow:'hidden',flex:'none'}}>
+              <DIcon d={IC.building} s={13}/>
+              <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{_activeProj.name}</span>
+            </button>
+          )}
           <div style={{flex:1,minWidth:8}}/>
           <div style={{display:'flex',alignItems:'center',gap:9,background:'#fff',border:`1px solid ${t.line}`,borderRadius:10,padding:'9px 13px',flex:'0 1 280px',minWidth:0,color:t.muted}}><DIcon d={IC.search} s={16}/><span style={{fontSize:13.5,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>Search RFIs, POs, cost codes…</span></div>
           <div style={{width:40,height:40,borderRadius:10,border:`1px solid ${t.line}`,background:'#fff',display:'grid',placeItems:'center',color:t.ink2,position:'relative',flex:'none'}}><DIcon d={IC.bell} s={18}/><span style={{position:'absolute',top:9,right:10,width:7,height:7,borderRadius:'50%',background:t.bad,border:'2px solid #fff'}}/></div>
@@ -515,6 +524,7 @@ function Content({user,route,go}){
   switch(route.view){
     case 'home': return ['owner','admin'].includes(user.role)?<PortfolioView user={user}/>:<MyWorkView user={user}/>;
     case 'advisor': return user.role==='owner' ? <AdvisorView user={user}/> : <PlaceholderView title="Profit Advisor"/>;
+    case 'projects': return <ProjectsManager/>;
     case 'pipeline': return <PipelineView user={user}/>;
     case 'project': return <ProjectView user={user} pid={route.pid} tab={route.tab}/>;
     case 'budget': return <BudgetView/>;
